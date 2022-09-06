@@ -74,57 +74,61 @@ export const asyncRoutes = [
     ],
   },
   {
-<<<<<<< HEAD
     path: '/home',
     component: Layout,
     redirect: '/home/swiper',
     alwaysShow: true,
     meta: {
       title: '首页配置',
-=======
-    path: '/modulemanagement',
-    component: Layout,
-    redirect: '/modulemanagement/membermanagement',
-    alwaysShow: true,
-    meta: {
-      title: '模块管理',
->>>>>>> 68fb9cac3130d5b5de5b7a593e3ea54a5635e354
-      icon: 'apps-line',
+      icon: 'remixicon-line',
     },
     children: [
       {
-<<<<<<< HEAD
         path: 'swiper',
         name: 'Swiper',
         component: () => import('@/views/home/swiper'),
         meta: {
           title: '轮播图配置',
-=======
-        path: 'membermanagement',
-        name: 'MemberManagement',
-        component: () => import('@/views/moduleManagement/memberManagement'),
-        meta: {
-          title: '会员管理',
->>>>>>> 68fb9cac3130d5b5de5b7a593e3ea54a5635e354
-          icon: 'table-2',
+          icon: 'remixicon-line',
         },
       },
       {
-<<<<<<< HEAD
         path: 'hot',
         name: 'Hot',
         component: () => import('@/views//home/hot'),
         meta: {
           title: '热销商品配置',
           icon: 'remixicon-line',
-=======
+        },
+      },
+    ],
+  },
+  {
+    path: '/modulemanagement',
+    component: Layout,
+    redirect: '/modulemanagement/membermanagement',
+    alwaysShow: true,
+    meta: {
+      title: '模块管理',
+      icon: 'apps-line',
+    },
+    children: [
+      {
+        path: 'membermanagement',
+        name: 'MemberManagement',
+        component: () => import('@/views/moduleManagement/memberManagement'),
+        meta: {
+          title: '会员管理',
+          icon: 'table-2',
+        },
+      },
+      {
         path: 'ordermanagement',
         name: 'OrderManagement',
         component: () => import('@/views/moduleManagement/orderManagement'),
         meta: {
           title: '订单管理',
           icon: 'table-2',
->>>>>>> 68fb9cac3130d5b5de5b7a593e3ea54a5635e354
         },
       },
     ],
