@@ -74,6 +74,36 @@ export const asyncRoutes = [
     ],
   },
   {
+    path: '/modulemanagement',
+    component: Layout,
+    redirect: '/modulemanagement/membermanagement',
+    alwaysShow: true,
+    meta: {
+      title: '模块管理',
+      icon: 'apps-line',
+    },
+    children: [
+      {
+        path: 'membermanagement',
+        name: 'MemberManagement',
+        component: () => import('@/views/moduleManagement/memberManagement'),
+        meta: {
+          title: '会员管理',
+          icon: 'table-2',
+        },
+      },
+      {
+        path: 'ordermanagement',
+        name: 'OrderManagement',
+        component: () => import('@/views/moduleManagement/orderManagement'),
+        meta: {
+          title: '订单管理',
+          icon: 'table-2',
+        },
+      },
+    ],
+  },
+  {
     path: '/test',
     component: Layout,
     redirect: '/test/test',
