@@ -74,6 +74,36 @@ export const asyncRoutes = [
     ],
   },
   {
+    path: '/home',
+    component: Layout,
+    redirect: '/home/swiper',
+    alwaysShow: true,
+    meta: {
+      title: '首页配置',
+      icon: 'remixicon-line',
+    },
+    children: [
+      {
+        path: 'swiper',
+        name: 'Swiper',
+        component: () => import('@/views/home/swiper'),
+        meta: {
+          title: '轮播图配置',
+          icon: 'remixicon-line',
+        },
+      },
+      {
+        path: 'hot',
+        name: 'Hot',
+        component: () => import('@/views//home/hot'),
+        meta: {
+          title: '热销商品配置',
+          icon: 'remixicon-line',
+        },
+      },
+    ],
+  },
+  {
     path: '/modulemanagement',
     component: Layout,
     redirect: '/modulemanagement/membermanagement',
