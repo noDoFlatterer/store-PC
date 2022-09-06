@@ -109,6 +109,7 @@
     },
     mounted() {
       this.handleLayouts()
+      // console.log(this.routes)
     },
     methods: {
       ...mapActions({
