@@ -145,21 +145,21 @@ export const asyncRoutes = [
         },
       },
       {
-        path: 'membermanagement',
-        name: 'MemberManagement',
-        component: () => import('@/views/moduleManagement/memberManagement'),
-        meta: {
-          title: '会员管理',
-          icon: 'table-2',
-        },
-      },
-      {
         path: 'goods',
         name: 'goods',
         component: () => import('@/views/moduleManagement/goods'),
         meta: {
           title: '商品管理',
           icon: 'remixicon-line',
+        },
+      },
+      {
+        path: 'membermanagement',
+        name: 'MemberManagement',
+        component: () => import('@/views/moduleManagement/memberManagement'),
+        meta: {
+          title: '会员管理',
+          icon: 'table-2',
         },
       },
       {
