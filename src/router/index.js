@@ -44,6 +44,27 @@ export const asyncRoutes = [
     ],
   },
   {
+    path: '/Dashboard',
+    component: Layout,
+    redirect: '/Dashboard/add',
+    alwaysShow: true,
+    meta: {
+      title: 'Dashboard',
+      icon: 'apps-line',
+    },
+    children: [
+      {
+        path: 'add',
+        name: 'add',
+        component: () => import('@/views/Dashboard/add'),
+        meta: {
+          title: '添加商品',
+          icon: 'table-2',
+        },
+      },
+    ],
+  },
+  {
     path: '/vab',
     component: Layout,
     redirect: '/vab/table',
@@ -73,6 +94,7 @@ export const asyncRoutes = [
       },
     ],
   },
+
   {
     path: '/home',
     component: Layout,
@@ -113,6 +135,24 @@ export const asyncRoutes = [
       icon: 'apps-line',
     },
     children: [
+      {
+        path: 'category',
+        name: 'category',
+        component: () => import('@/views/moduleManagement/category'),
+        meta: {
+          title: '分类管理',
+          icon: 'apps-line',
+        },
+      },
+      {
+        path: 'goods',
+        name: 'goods',
+        component: () => import('@/views/moduleManagement/goods'),
+        meta: {
+          title: '商品管理',
+          icon: 'remixicon-line',
+        },
+      },
       {
         path: 'membermanagement',
         name: 'MemberManagement',
