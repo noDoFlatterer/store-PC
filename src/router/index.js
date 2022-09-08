@@ -43,9 +43,6 @@ export const asyncRoutes = [
       },
     ],
   },
-<<<<<<< HEAD
-
-  //
   {
     path: '/Dashboard',
     component: Layout,
@@ -67,11 +64,6 @@ export const asyncRoutes = [
       },
     ],
   },
-
-  //
-
-=======
->>>>>>> 5489d1520b4ce0db857a86668832ca2a90d66edb
   {
     path: '/vab',
     component: Layout,
@@ -102,15 +94,7 @@ export const asyncRoutes = [
       },
     ],
   },
-<<<<<<< HEAD
 
-  //
-
-  {
-    path: '/moduleManagement',
-    component: Layout,
-    redirect: '/moduleManagement/goods',
-=======
   {
     path: '/home',
     component: Layout,
@@ -145,7 +129,6 @@ export const asyncRoutes = [
     path: '/modulemanagement',
     component: Layout,
     redirect: '/modulemanagement/membermanagement',
->>>>>>> 5489d1520b4ce0db857a86668832ca2a90d66edb
     alwaysShow: true,
     meta: {
       title: '模块管理',
@@ -153,48 +136,43 @@ export const asyncRoutes = [
     },
     children: [
       {
-<<<<<<< HEAD
         path: 'category',
         name: 'category',
         component: () => import('@/views/moduleManagement/category'),
         meta: {
           title: '分类管理',
-=======
+          icon: 'apps-line',
+        },
+      },
+      {
         path: 'membermanagement',
         name: 'MemberManagement',
         component: () => import('@/views/moduleManagement/memberManagement'),
         meta: {
           title: '会员管理',
->>>>>>> 5489d1520b4ce0db857a86668832ca2a90d66edb
           icon: 'table-2',
         },
       },
       {
-<<<<<<< HEAD
         path: 'goods',
         name: 'goods',
         component: () => import('@/views/moduleManagement/goods'),
         meta: {
           title: '商品管理',
           icon: 'remixicon-line',
-=======
+        },
+      },
+      {
         path: 'ordermanagement',
         name: 'OrderManagement',
         component: () => import('@/views/moduleManagement/orderManagement'),
         meta: {
           title: '订单管理',
           icon: 'table-2',
->>>>>>> 5489d1520b4ce0db857a86668832ca2a90d66edb
         },
       },
     ],
   },
-<<<<<<< HEAD
-
-  //
-
-=======
->>>>>>> 5489d1520b4ce0db857a86668832ca2a90d66edb
   {
     path: '/test',
     component: Layout,

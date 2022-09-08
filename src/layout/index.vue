@@ -109,10 +109,6 @@
     },
     mounted() {
       this.handleLayouts()
-<<<<<<< HEAD
-=======
-      // console.log(this.routes)
->>>>>>> 5489d1520b4ce0db857a86668832ca2a90d66edb
     },
     methods: {
       ...mapActions({
