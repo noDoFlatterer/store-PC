@@ -44,6 +44,27 @@ export const asyncRoutes = [
     ],
   },
   {
+    path: '/Dashboard',
+    component: Layout,
+    redirect: '/Dashboard/add',
+    alwaysShow: true,
+    meta: {
+      title: 'Dashboard',
+      icon: 'apps-line',
+    },
+    children: [
+      {
+        path: 'add',
+        name: 'add',
+        component: () => import('@/views/Dashboard/add'),
+        meta: {
+          title: '添加商品',
+          icon: 'table-2',
+        },
+      },
+    ],
+  },
+  {
     path: '/vab',
     component: Layout,
     redirect: '/vab/table',
@@ -73,6 +94,7 @@ export const asyncRoutes = [
       },
     ],
   },
+
   {
     path: '/Dashboard',
     component: Layout,
@@ -153,6 +175,24 @@ export const asyncRoutes = [
     },
     children: [
       {
+        path: 'category',
+        name: 'category',
+        component: () => import('@/views/moduleManagement/category'),
+        meta: {
+          title: '分类管理',
+          icon: 'apps-line',
+        },
+      },
+      {
+        path: 'goods',
+        name: 'goods',
+        component: () => import('@/views/moduleManagement/goods'),
+        meta: {
+          title: '商品管理',
+          icon: 'remixicon-line',
+        },
+      },
+      {
         path: 'membermanagement',
         name: 'MemberManagement',
         component: () => import('@/views/moduleManagement/memberManagement'),
@@ -168,6 +208,29 @@ export const asyncRoutes = [
         meta: {
           title: '订单管理',
           icon: 'table-2',
+        },
+      },
+    ],
+  },
+  {
+    path: '/account',
+    component: Layout,
+    redirect: '/index',
+    alwaysShow: true,
+    meta: {
+      title: '系统管理',
+      icon: 'home-4-line',
+      affix: true,
+    },
+    children: [
+      {
+        path: 'change',
+        name: 'change',
+        component: () => import('@/views/account'),
+        meta: {
+          title: '修改密码',
+          icon: 'home-4-line',
+          affix: true,
         },
       },
     ],
