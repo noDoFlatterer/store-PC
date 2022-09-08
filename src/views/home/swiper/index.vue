@@ -55,7 +55,7 @@
             label="排序值"
             :rules="[{ required: true }]"
           >
-            <a-input v-model:value="formState.user.sort" />
+            <a-input-number v-model:value="formState.user.sort" />
           </a-form-item>
           <a-form-item :wrapper-col="{ ...layout.wrapperCol, offset: 8 }">
             <a-button type="primary" html-type="submit">Submit</a-button>
@@ -201,8 +201,15 @@
       }
       // 添加
       const add = () => {
+        
         formvisible.value = true
         addorchange.value = true
+        formState.user= {
+          img: '',
+          link: '',
+          sort: 1,
+          addtime: '',
+        }
       }
 
       const hasSelected = computed(() => state.selectedRowKeys.length > 0)
