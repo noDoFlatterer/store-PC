@@ -201,10 +201,9 @@
       }
       // 添加
       const add = () => {
-        
         formvisible.value = true
         addorchange.value = true
-        formState.user= {
+        formState.user = {
           img: '',
           link: '',
           sort: 1,

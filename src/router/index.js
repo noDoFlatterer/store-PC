@@ -21,7 +21,6 @@ export const constantRoutes = [
   },
 ]
 export const asyncRoutes = [
-  
   {
     path: '/',
     component: Layout,
