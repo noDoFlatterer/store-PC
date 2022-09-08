@@ -138,7 +138,7 @@
     },
     {
       goodsnumber: 12345,
-      key: '1',
+      key: '2',
       action: '',
       addtime: 32,
       sort: 1,
@@ -147,7 +147,7 @@
     },
     {
       goodsnumber: 12345,
-      key: '1',
+      key: '3',
       action: '',
       addtime: 32,
       sort: 1,

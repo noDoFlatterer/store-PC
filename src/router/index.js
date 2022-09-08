@@ -174,6 +174,29 @@ export const asyncRoutes = [
     ],
   },
   {
+    path: '/account',
+    component: Layout,
+    redirect: '/index',
+    alwaysShow: true,
+    meta: {
+      title: '系统管理',
+      icon: 'home-4-line',
+      affix: true,
+    },
+    children: [
+      {
+        path: 'change',
+        name: 'change',
+        component: () => import('@/views/account'),
+        meta: {
+          title: '修改密码',
+          icon: 'home-4-line',
+          affix: true,
+        },
+      },
+    ],
+  },
+  {
     path: '/test',
     component: Layout,
     redirect: '/test/test',
