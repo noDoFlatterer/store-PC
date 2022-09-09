@@ -31,8 +31,6 @@ export function getAccessToken() {
 export function setAccessToken(accessToken) {
   if (storage) {
     if ('localStorage' === storage) {
-      console.log('ddfffffff')
-      console.log('hhgh', accessToken)
       return localStorage.setItem(tokenTableName, accessToken)
     } else if ('sessionStorage' === storage) {
       return sessionStorage.setItem(tokenTableName, accessToken)
