@@ -49,7 +49,6 @@
   import { dependencies, devDependencies } from '*/package.json'
   import { mapActions, mapGetters } from 'vuex'
   import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
-
   export default {
     name: 'Login',
     components: {

@@ -70,6 +70,7 @@ const actions = {
    */
   async login({ commit }, userInfo) {
     const { data } = await login(userInfo)
+    // 这里获取登录密码账号后 放入localStorage 并判断
     const accessToken = data
     if (accessToken) {
       commit('setAccessToken', accessToken)
