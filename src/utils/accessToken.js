@@ -31,6 +31,8 @@ export function getAccessToken() {
 export function setAccessToken(accessToken) {
   if (storage) {
     if ('localStorage' === storage) {
+      console.log('ddfffffff')
+      console.log('hhgh', accessToken)
       return localStorage.setItem(tokenTableName, accessToken)
     } else if ('sessionStorage' === storage) {
       return sessionStorage.setItem(tokenTableName, accessToken)
@@ -50,17 +52,17 @@ export function setAccessToken(accessToken) {
  * @returns {void|Promise<void>}
  */
 export function removeAccessToken() {
-  if (storage) {
-    if ('localStorage' === storage) {
-      return localStorage.removeItem(tokenTableName)
-    } else if ('sessionStorage' === storage) {
-      return sessionStorage.clear()
-    } else if ('cookie' === storage) {
-      return cookie.remove(tokenTableName)
-    } else {
-      return localStorage.removeItem(tokenTableName)
-    }
-  } else {
-    return localStorage.removeItem(tokenTableName)
-  }
+  // if (storage) {
+  //   if ('localStorage' === storage) {
+  //     return localStorage.removeItem(tokenTableName)
+  //   } else if ('sessionStorage' === storage) {
+  //     return sessionStorage.clear()
+  //   } else if ('cookie' === storage) {
+  //     return cookie.remove(tokenTableName)
+  //   } else {
+  //     return localStorage.removeItem(tokenTableName)
+  //   }
+  // } else {
+  //   return localStorage.removeItem(tokenTableName)
+  // }
 }

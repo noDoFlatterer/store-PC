@@ -96,6 +96,27 @@ export const asyncRoutes = [
   },
 
   {
+    path: '/Dashboard',
+    component: Layout,
+    redirect: '/Dashboard/dashboard',
+    alwaysShow: true,
+    meta: {
+      title: 'Dashboard',
+      icon: 'apps-line',
+    },
+    children: [
+      {
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/Dashboard/dashboard'),
+        meta: {
+          title: 'Dashboard',
+          icon: 'remixicon-line',
+        },
+      },
+    ],
+  },
+  {
     path: '/home',
     component: Layout,
     redirect: '/home/swiper',
@@ -121,6 +142,24 @@ export const asyncRoutes = [
         meta: {
           title: '热销商品配置',
           icon: 'remixicon-line',
+        },
+      },
+      {
+        path: 'new',
+        name: 'New',
+        component: () => import('@/views//home/new'),
+        meta: {
+          title: '新品上线配置',
+          icon: 'add-fill',
+        },
+      },
+      {
+        path: 'recommend',
+        name: 'Recommend',
+        component: () => import('@/views//home/recommend'),
+        meta: {
+          title: '为你推荐配置',
+          icon: 'hand-heart-line',
         },
       },
     ],
