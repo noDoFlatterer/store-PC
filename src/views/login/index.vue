@@ -6,7 +6,7 @@
         <div class="login-container-form">
           <div class="login-container-hello">hello!</div>
           <div class="login-container-title">欢迎来到 {{ title }}</div>
-          <a-form :model="form" @submit="handleSubmit" @submit.prevent>
+          <a-form :model="form" @finish="handleSubmit" @submit.prevent>
             <a-form-item>
               <a-input v-model:value="form.username" placeholder="Username">
                 <template v-slot:prefix>
@@ -82,7 +82,7 @@
       },
     },
     mounted() {
-      this.form.username = 'admin'
+      this.form.username = '15090313732'
       this.form.password = '123456'
       /*  setTimeout(() => {
         this.handleSubmit()

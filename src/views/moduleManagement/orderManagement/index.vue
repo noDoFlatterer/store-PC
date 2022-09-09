@@ -11,7 +11,6 @@
         ref="select"
         v-model:value="select_value"
         style="width: 120px"
-        @focus="focus"
         @change="handleChange"
       >
         <a-select-option value="jack">Jack</a-select-option>

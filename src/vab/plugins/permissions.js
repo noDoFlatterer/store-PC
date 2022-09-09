@@ -14,10 +14,9 @@ import {
 
 router.beforeEach(async (to, from, next) => {
   let hasToken = store.getters['user/accessToken']
-
   if (!loginInterception) hasToken = true
-
   if (hasToken) {
+    // 登录直接进
     if (to.path === '/login') {
       next({ path: '/' })
     } else {
@@ -29,7 +28,8 @@ router.beforeEach(async (to, from, next) => {
         next()
       } else {
         try {
-          if (loginInterception) {
+          // 待看
+          if (!loginInterception) {
             await store.dispatch('user/getUserInfo')
           } else {
             //loginInterception为false（关闭登录拦截时）时，创建虚拟角色
