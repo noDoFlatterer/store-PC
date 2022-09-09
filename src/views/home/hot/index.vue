@@ -59,19 +59,13 @@
       </a-modal>
     </div>
     <a-table
-      :row-selection="{
-        selectedRowKeys: selectedRowKeys,
-        onChange: onSelectChange,
-      }"
+      :row-selection="rowSelection"
       :columns="columns"
       :data-source="data"
       :pagination="pagination"
     >
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'img'">
-          <img :src="record.img" alt="" srcset="" />
-        </template>
-        <template v-else-if="column.key === 'link'">
+        <template v-if="column.key === 'link'">
           <a>
             {{ record.link }}
           </a>
@@ -202,12 +196,13 @@
       }
 
       const hasSelected = computed(() => state.selectedRowKeys.length > 0)
-
-      const onSelectChange = (selectedRowKeys) => {
-        console.log('选中了', selectedRowKeys)
-
-        state.selectedRowKeys = selectedRowKeys
+      const rowSelection = {
+        onChange: (selectedRowKeys, selectedRows) => {
+          console.log('选中了', selectedRowKeys, selectedRows)
+          state.selectedRowKeys = selectedRowKeys
+        },
       }
+
       // 修改
       const change = (record) => {
         formvisible.value = true
@@ -215,7 +210,6 @@
         formState.user = record
         console.log(formState.user)
       }
-
       // 表单
       const layout = {
         labelCol: {
@@ -242,7 +236,7 @@
         formvisible.value = false
         state.loading = true // ajax request after empty completing
         formState.user.addtime = getNowtime()
-        // 这里需要进行深拷贝
+        // 这里需要进行一层深拷贝
         data.push({ ...formState.user })
         setTimeout(() => {
           state.loading = false
@@ -256,7 +250,7 @@
         ...toRefs(state),
         // func
 
-        onSelectChange,
+        // onSelectChange,
         visible,
         formvisible,
         showModal,
@@ -270,6 +264,7 @@
         add,
         //  分页
         pagination,
+        rowSelection,
       }
     },
   })
