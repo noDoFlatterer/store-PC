@@ -54,6 +54,15 @@ export const asyncRoutes = [
     },
     children: [
       {
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/Dashboard/dashboard'),
+        meta: {
+          title: 'Dashboard',
+          icon: 'remixicon-line',
+        },
+      },
+      {
         path: 'add',
         name: 'add',
         component: () => import('@/views/Dashboard/add'),
@@ -89,28 +98,6 @@ export const asyncRoutes = [
         component: () => import('@/views/vab/icon'),
         meta: {
           title: '图标',
-          icon: 'remixicon-line',
-        },
-      },
-    ],
-  },
-
-  {
-    path: '/Dashboard',
-    component: Layout,
-    redirect: '/Dashboard/dashboard',
-    alwaysShow: true,
-    meta: {
-      title: 'Dashboard',
-      icon: 'apps-line',
-    },
-    children: [
-      {
-        path: 'dashboard',
-        name: 'Dashboard',
-        component: () => import('@/views/Dashboard/dashboard'),
-        meta: {
-          title: 'Dashboard',
           icon: 'remixicon-line',
         },
       },

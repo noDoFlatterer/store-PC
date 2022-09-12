@@ -4,7 +4,9 @@
       <a-button @click="add(), showModal()" type="primary" danger>
         +增加商品
       </a-button>
-      <a-button @click="deleteAll()" type="primary" danger>批量删除</a-button>
+      <a-button @click="deleteAll()" type="primary" danger class="del">
+        批量删除
+      </a-button>
       <!-- 表单 -->
       <a-modal v-model:visible="visible" title="添加分类" @ok="onFinish">
         <a-form :model="formState" name="basic" autocomplete="off">
@@ -218,3 +220,8 @@
     },
   })
 </script>
+<style scoped>
+  .del {
+    margin-left: 10px;
+  }
+</style>

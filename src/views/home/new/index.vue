@@ -17,7 +17,9 @@
       <a-button type="primary" class="add" @click="add">添加</a-button>
 
       <!-- 添加的表单 -->
-      <a-modal v-model:visible="formvisible" :footer="null" title="添加轮播图">
+      <!-- visible对话框是否可见  -->
+      <a-modal v-model:visible="formvisible" :footer="null" title="修改商品">
+        <!-- name：表单名称，会作为表单字段 id 前缀使用  model：表单名称，会作为表单字段 id 前缀使用   validateTrigger：统一设置字段校验规则-->
         <a-form
           :model="formState"
           v-bind="layout"
@@ -25,6 +27,7 @@
           :validate-messages="validateMessages"
           @finish="onFinish"
         >
+          <!-- name：表单域 model 字段，在使用 validate、resetFields 方法的情况下，该属性是必填的 -->
           <a-form-item
             :name="['user', 'goodsname']"
             label="商品名称"
@@ -73,10 +76,7 @@
       :pagination="pagination"
     >
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'img'">
-          <img :src="record.img" alt="" srcset="" />
-        </template>
-        <template v-else-if="column.key === 'link'">
+        <template v-if="column.key === 'link'">
           <a>
             {{ record.link }}
           </a>
@@ -101,8 +101,8 @@
   const columns = [
     {
       title: '商品名称',
-      dataIndex: 'goodsname',
-      key: 'goodsname',
+      dataIndex: 'goodsname', //列数据在数据项中对应的路径，支持通过数组查询嵌套路径
+      key: 'goodsname', //Vue 需要的 key，如果已经设置了唯一的 dataIndex，可以忽略这个属性
     },
     {
       title: '跳转连接',
@@ -133,7 +133,7 @@
 
   const data = reactive([
     {
-      goodsnumber: 12345,
+      goodsnumber: 1,
       key: '1',
       action: '',
       addtime: 32,
@@ -142,8 +142,8 @@
       goodsname: '大别墅',
     },
     {
-      goodsnumber: 12345,
-      key: '1',
+      goodsnumber: 2,
+      key: '2',
       action: '',
       addtime: 32,
       sort: 1,
@@ -151,8 +151,8 @@
       goodsname: '大别墅',
     },
     {
-      goodsnumber: 12345,
-      key: '1',
+      goodsnumber: 3,
+      key: '3',
       action: '',
       addtime: 32,
       sort: 1,

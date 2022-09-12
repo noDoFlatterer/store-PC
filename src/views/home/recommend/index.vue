@@ -31,19 +31,22 @@
           >
             <a-input v-model:value="formState.user.goodsname" />
           </a-form-item>
-          <a-form-item
+          <!-- <a-form-item
             :name="['user', 'link']"
             label="跳转链接"
             :rules="[{ required: true }]"
           >
             <a-input v-model:value="formState.user.link" />
-          </a-form-item>
+          </a-form-item> -->
           <a-form-item
             :name="['user', 'goodsnumber']"
             label="商品编号"
             :rules="[{ required: true }]"
           >
-            <a-input v-model:value="formState.user.goodsnumber" />
+            <a-input
+              v-model:value="formState.user.goodsnumber"
+              disabled="true"
+            />
           </a-form-item>
           <a-form-item
             :name="['user', 'sort']"
@@ -60,23 +63,21 @@
     </div>
     <a-table
       :row-selection="{
-        selectedRowKeys: selectedRowKeys,
-        onChange: onSelectChange,
+        //列表项是否可选择
+        selectedRowKeys: selectedRowKeys, //指定选中项的 key 数组，需要和 onChange 进行配合
+        onChange: onSelectChange, //选中项发生变化时的回调
       }"
       :columns="columns"
       :data-source="data"
       :pagination="pagination"
     >
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'img'">
-          <img :src="record.img" alt="" srcset="" />
-        </template>
-        <template v-else-if="column.key === 'link'">
+        <!-- <template v-if="column.key === 'link'">
           <a>
             {{ record.link }}
           </a>
-        </template>
-        <template v-else-if="column.key === 'addtime'">
+        </template> -->
+        <template v-if="column.key === 'addtime'">
           <a>
             {{ record.addtime }}
           </a>
@@ -99,11 +100,11 @@
       dataIndex: 'goodsname',
       key: 'goodsname',
     },
-    {
-      title: '跳转连接',
-      dataIndex: 'link',
-      key: 'link',
-    },
+    // {
+    //   title: '跳转连接',
+    //   dataIndex: 'link',
+    //   key: 'link',
+    // },
     {
       title: '排序值',
       dataIndex: 'sort',
@@ -133,7 +134,7 @@
       action: '',
       addtime: 32,
       sort: 1,
-      link: 'www.baidu.com',
+      // link: 'www.baidu.com',
       goodsname: '大别墅',
     },
     {
@@ -142,7 +143,7 @@
       action: '',
       addtime: 32,
       sort: 1,
-      link: 'www.baidu.com',
+      // link: 'www.baidu.com',
       goodsname: '大别墅',
     },
     {
@@ -151,7 +152,7 @@
       action: '',
       addtime: 32,
       sort: 1,
-      link: 'www.baidu.com',
+      // link: 'www.baidu.com',
       goodsname: '大别墅',
     },
   ])
@@ -170,7 +171,7 @@
         user: {
           goodsnumber: '',
           goodsname: '',
-          link: '',
+          // link: '',
           sort: 1,
           addtime: '',
         },
@@ -275,10 +276,6 @@
   })
 </script>
 <style>
-  img {
-    height: 100px;
-    width: 100px;
-  }
   .del {
     margin-left: 10px;
   }
