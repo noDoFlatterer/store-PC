@@ -70,7 +70,8 @@ const actions = {
    */
   async login({ commit }, userInfo) {
     const { data } = await login(userInfo)
-    const accessToken = data[tokenName]
+    // 这里获取登录密码账号后 放入localStorage 并判断
+    const accessToken = data
     if (accessToken) {
       commit('setAccessToken', accessToken)
       const hour = new Date().getHours()
@@ -93,6 +94,7 @@ const actions = {
     }
   },
   /**
+   * 这个获取用户信息接口需要改
    * @author chuzhixin 1204505056@qq.com
    * @description 获取用户信息接口 这个接口非常非常重要，如果没有明确底层前逻辑禁止修改此方法，错误的修改可能造成整个框架无法正常使用
    * @param {*} { commit, dispatch, state }

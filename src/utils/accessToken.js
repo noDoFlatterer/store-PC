@@ -50,17 +50,17 @@ export function setAccessToken(accessToken) {
  * @returns {void|Promise<void>}
  */
 export function removeAccessToken() {
-  if (storage) {
-    if ('localStorage' === storage) {
-      return localStorage.removeItem(tokenTableName)
-    } else if ('sessionStorage' === storage) {
-      return sessionStorage.clear()
-    } else if ('cookie' === storage) {
-      return cookie.remove(tokenTableName)
-    } else {
-      return localStorage.removeItem(tokenTableName)
-    }
-  } else {
-    return localStorage.removeItem(tokenTableName)
-  }
+  // if (storage) {
+  //   if ('localStorage' === storage) {
+  //     return localStorage.removeItem(tokenTableName)
+  //   } else if ('sessionStorage' === storage) {
+  //     return sessionStorage.clear()
+  //   } else if ('cookie' === storage) {
+  //     return cookie.remove(tokenTableName)
+  //   } else {
+  //     return localStorage.removeItem(tokenTableName)
+  //   }
+  // } else {
+  //   return localStorage.removeItem(tokenTableName)
+  // }
 }

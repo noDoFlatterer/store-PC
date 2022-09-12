@@ -60,16 +60,16 @@ module.exports = {
       errors: true,
     },
     // 注释掉的地方是前端配置代理访问后端的示例
-    // proxy: {
-    //   [baseURL]: {
-    //     target: `http://你的后端接口地址`,
-    //     ws: true,
-    //     changeOrigin: true,
-    //     pathRewrite: {
-    //       ["^/" + baseURL]: "",
-    //     },
-    //   },
-    // },
+    proxy: {
+      '/api': {
+        target: 'http://47.92.163.212:8080',
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': '',
+        },
+      },
+    },
     after: mockServer(),
   },
   configureWebpack() {

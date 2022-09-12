@@ -6,7 +6,7 @@
         <div class="login-container-form">
           <div class="login-container-hello">hello!</div>
           <div class="login-container-title">欢迎来到 {{ title }}</div>
-          <a-form :model="form" @submit="handleSubmit" @submit.prevent>
+          <a-form :model="form" @finish="handleSubmit" @submit.prevent>
             <a-form-item>
               <a-input v-model:value="form.username" placeholder="Username">
                 <template v-slot:prefix>
@@ -49,7 +49,6 @@
   import { dependencies, devDependencies } from '*/package.json'
   import { mapActions, mapGetters } from 'vuex'
   import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
-
   export default {
     name: 'Login',
     components: {
@@ -82,7 +81,7 @@
       },
     },
     mounted() {
-      this.form.username = 'admin'
+      this.form.username = '15090313732'
       this.form.password = '123456'
       /*  setTimeout(() => {
         this.handleSubmit()
