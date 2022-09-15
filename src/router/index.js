@@ -191,11 +191,34 @@ export const asyncRoutes = [
       {
         path: 'ordermanagement',
         name: 'OrderManagement',
-        component: () => import('@/views/moduleManagement/orderManagement'),
         meta: {
           title: '订单管理',
           icon: 'table-2',
         },
+        children: [
+          {
+            path: '',
+            name: 'OrderManagement1',
+            hidden: true,
+            component: () => import('@/views/moduleManagement/orderManagement'),
+            meta: {
+              title: '订单管理',
+              icon: 'table-2',
+            },
+          },
+          {
+            path: 'detail',
+            name: 'OrderManagement2',
+            hidden: true,
+            component: () =>
+              import('@/views/moduleManagement/orderManagement/detail'),
+            meta: {
+              title: '订单详情',
+              icon: 'table-2',
+              tagHidden: true,
+            },
+          },
+        ],
       },
     ],
   },
