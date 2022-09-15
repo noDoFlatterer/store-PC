@@ -5,7 +5,7 @@ import {
   debounce,
   requestTimeout,
   successCode,
-  tokenName,
+  // tokenName,
 } from '@/config'
 import store from '@/store'
 import qs from 'qs'
@@ -55,7 +55,8 @@ const instance = axios.create({
 instance.interceptors.request.use(
   (config) => {
     if (store.getters['user/accessToken'])
-      config.headers[tokenName] = store.getters['user/accessToken']
+      config.headers['Authorization'] =
+        'Bearer ' + store.getters['user/accessToken']
     if (
       config.data &&
       config.headers['Content-Type'] ===
