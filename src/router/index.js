@@ -54,21 +54,21 @@ export const asyncRoutes = [
     },
     children: [
       {
-        path: 'add',
-        name: 'add',
-        component: () => import('@/views/Dashboard/add'),
-        meta: {
-          title: '添加商品',
-          icon: 'table-2',
-        },
-      },
-      {
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/Dashboard/dashboard'),
         meta: {
           title: 'Dashboard',
           icon: 'remixicon-line',
+        },
+      },
+      {
+        path: 'add',
+        name: 'add',
+        component: () => import('@/views/Dashboard/add'),
+        meta: {
+          title: '添加商品',
+          icon: 'table-2',
         },
       },
     ],
