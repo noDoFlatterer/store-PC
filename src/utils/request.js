@@ -91,6 +91,9 @@ instance.interceptors.response.use(
       return data
     } else {
       handleCode(code, msg)
+      if (code == 2005) {
+        console.log('返回到登录页')
+      }
       return Promise.reject(
         'vue-admin-beautiful请求异常拦截:' +
           JSON.stringify({ url: config.url, code, msg }) || 'Error'

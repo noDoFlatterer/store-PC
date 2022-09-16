@@ -120,10 +120,7 @@
       }
       const changeState = (key) => {
         let date = data.value.filter((item) => item.key === key)
-        console.log(date)
-        // console.log(date[0].state);
         date[0].state = !date[0].state
-        // console.log(date[0].state);
       }
       var router = useRouter()
       const toAdd = (record) => {

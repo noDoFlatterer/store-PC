@@ -24,14 +24,18 @@
           :validate-messages="validateMessages"
           @finish="onFinish"
         >
-          <a-form-item :name="['user', 'email']" label="图片">
+          <a-form-item
+            :name="['fileList']"
+            label="图片"
+            :rules="[{ required: true, message: '图片不能为空!' }]"
+          >
             <a-upload
               v-model:file-list="fileList"
               name="avatar"
               list-type="picture-card"
               class="avatar-uploader"
               :show-upload-list="false"
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+              :customRequest="customRequest"
               :before-upload="beforeUpload"
               @change="handleChange"
             >
@@ -44,18 +48,13 @@
             </a-upload>
           </a-form-item>
           <a-form-item
-            :name="['user', 'link']"
-            label="跳转链接"
-            :rules="[{ required: true }]"
-          >
-            <a-input v-model:value="formState.user.link" />
-          </a-form-item>
-          <a-form-item
-            :name="['user', 'sort']"
+            :name="['user', 'sort_num']"
             label="排序值"
-            :rules="[{ required: true }]"
+            :rules="[
+              { required: true, message: '排序值不能为空!', trigger: 'change' },
+            ]"
           >
-            <a-input-number v-model:value="formState.user.sort" />
+            <a-input-number v-model:value="formState.user.sort_num" />
           </a-form-item>
           <a-form-item :wrapper-col="{ ...layout.wrapperCol, offset: 8 }">
             <a-button type="primary" html-type="submit">Submit</a-button>
@@ -69,17 +68,14 @@
         onChange: onSelectChange,
       }"
       :columns="columns"
-      :data-source="data"
+      :data-source="tableData.data"
       :pagination="pagination"
+      :row-key="(record) => record.id"
+      @change="changePage"
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'img'">
           <img :src="record.img" alt="" srcset="" />
-        </template>
-        <template v-else-if="column.key === 'link'">
-          <a>
-            {{ record.link }}
-          </a>
         </template>
         <template v-else-if="column.key === 'addtime'">
           <a>
@@ -88,7 +84,9 @@
         </template>
         <template v-else-if="column.key === 'action'">
           <a-button type="primary" @click="change(record)">修改</a-button>
-          <a-button type="primary" danger class="del">删除</a-button>
+          <a-button type="primary" danger class="del" @click="delOne(record)">
+            删除
+          </a-button>
         </template>
       </template>
     </a-table>
@@ -99,7 +97,14 @@
   import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
   import { message } from 'ant-design-vue'
   import { computed, defineComponent, reactive, toRefs, ref } from 'vue'
-  import getNowtime from '@/utils/getNowtime'
+  import {
+    getFirstPage,
+    upPhotos,
+    updateSwiper,
+    delPhotos,
+    addSwiper,
+    getPages,
+  } from '@/api/swiper.js'
   function getBase64(img, callback) {
     const reader = new FileReader()
     reader.addEventListener('load', () => callback(reader.result))
@@ -112,19 +117,12 @@
       key: 'img',
     },
     {
-      title: '跳转连接',
-      dataIndex: 'link',
-      key: 'link',
-    },
-    {
       title: '排序值',
-      dataIndex: 'sort',
-      key: 'sort',
+      dataIndex: 'sort_num',
     },
     {
       title: '添加时间',
-      dataIndex: 'addtime',
-      key: 'addtime',
+      dataIndex: 'created_at',
     },
     {
       title: '操作',
@@ -132,25 +130,9 @@
       key: 'action',
     },
   ]
-  const data = reactive([
-    {
-      key: '1',
-      action: '',
-      addtime: 32,
-      sort: 1,
-      link: 'www.baidu.com',
-      img: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fc-ssl.duitang.com%2Fuploads%2Fblog%2F202106%2F23%2F20210623123213_08677.thumb.1000_0.jpg&refer=http%3A%2F%2Fc-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1664963048&t=512152f373d6bbb705c2db486a95d550https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fc-ssl.duitang.com%2Fuploads%2Fblog%2F202106%2F23%2F20210623123213_08677.thumb.1000_0.jpg&refer=http%3A%2F%2Fc-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1664963048&t=512152f373d6bbb705c2db486a95d550',
-    },
-    {
-      key: '2',
-      action: '',
-      addtime: 42,
-      sort: 2,
-      link: 'www.baidu.com',
-      img: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fc-ssl.duitang.com%2Fuploads%2Fblog%2F202106%2F23%2F20210623123213_08677.thumb.1000_0.jpg&refer=http%3A%2F%2Fc-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1664963048&t=512152f373d6bbb705c2db486a95d550https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fc-ssl.duitang.com%2Fuploads%2Fblog%2F202106%2F23%2F20210623123213_08677.thumb.1000_0.jpg&refer=http%3A%2F%2Fc-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1664963048&t=512152f373d6bbb705c2db486a95d550',
-    },
-  ])
-
+  let tableData = reactive({
+    data: [],
+  })
   export default defineComponent({
     components: {
       LoadingOutlined,
@@ -168,11 +150,11 @@
       // 表单信息
       const formState = reactive({
         user: {
-          img: '',
-          link: '',
-          sort: 1,
-          addtime: '',
+          image: '',
+          sort_num: 1,
+          created_at: '',
         },
+        fileList: {},
       })
       // 添加图片
       const fileList = ref([])
@@ -185,46 +167,78 @@
       const pagination = reactive({
         showLessItems: true,
         showQuickJumper: true,
-        showSizeChanger: true,
+        showSizeChanger: false,
         defaultPageSize: 5,
+        total: 10,
       })
+      // 当前页面
+      const nowPage = ref(1)
+      // 切换页面
+      const changePage = (page) => {
+        console.log(page)
+        nowPage.value = page.current
+        if (page.current == 1) {
+          update()
+        } else {
+          updateOther(page.pageSize, page.current)
+        }
+      }
       // 用来批量删除
-      const handleOk = (e) => {
-        console.log(e)
+      const handleOk = () => {
         visible.value = false
-        state.loading = true // ajax request after empty completing
-
-        setTimeout(() => {
+        state.loading = true
+        delPhotos([...state.selectedRowKeys]).then((res) => {
+          message.info(res.data)
           state.loading = false
           state.selectedRowKeys = []
-        }, 1000)
+          if (nowPage.value == 1) {
+            update()
+            // 解决最后一页删除完页面不会跳转问题
+          } else if (
+            pagination.total % 5 == state.selectedRowKeys.length &&
+            pagination.total / 5 == nowPage.value
+          ) {
+            updateOther(5, nowPage.value - 1)
+          } else {
+            updateOther(5, nowPage.value)
+          }
+        })
+      }
+      // 删除一个
+      const delOne = (record) => {
+        console.log(record.id)
+        delPhotos([record.id]).then((res) => {
+          message.info(res.data)
+          if (nowPage.value == 1) {
+            update()
+          } else if (
+            pagination.total % 5 == 1 &&
+            Math.floor(pagination.total / 5) == nowPage.value - 1
+          ) {
+            updateOther(5, nowPage.value - 1)
+          } else {
+            updateOther(5, nowPage.value)
+          }
+        })
       }
       // 添加
       const add = () => {
         formvisible.value = true
         addorchange.value = true
-        formState.user = {
-          img: '',
-          link: '',
-          sort: 1,
-          addtime: '',
-        }
+        // 清空表单
+        formState.user = {}
+        imageUrl.value = ''
       }
-
+      // 判断选中
       const hasSelected = computed(() => state.selectedRowKeys.length > 0)
-
       const onSelectChange = (selectedRowKeys) => {
-        console.log('选中了', selectedRowKeys)
-
         state.selectedRowKeys = selectedRowKeys
       }
-      // 修改
+      // 修改按钮
       const change = (record) => {
         formvisible.value = true
         addorchange.value = false
-        console.log(record)
         formState.user = record
-        console.log(formState.user)
       }
       // 表单
       const layout = {
@@ -246,23 +260,33 @@
         },
       }
       // 提交表单
-      const onFinish = (values) => {
-        var time = getNowtime()
-        console.log(values)
+      const onFinish = () => {
         if (addorchange.value) {
-          console.log('Success:', values)
+          // 添加
           formvisible.value = false
           state.loading = true // ajax request after empty completing
-          formState.user.addtime = time
           // 这里需要进行深拷贝
+          const test = {
+            image: formState.user.image,
+            sort_number: formState.user.sort_num,
+          }
+          addSwiper(test).then((res) => {
+            message.info(res.data)
+            if (nowPage.value == 1) {
+              update()
+            } else {
+              updateOther(5, nowPage.value)
+            }
+          })
         } else {
-          formState.user = { ...values.user, addtime: time }
-          data.push({ ...formState.user })
-
+          // 修改
+          updateSwiper(formState.user).then((res) => {
+            message.info(res.data)
+          })
           formvisible.value = false
+
           state.loading = true // ajax request after empty completing
         }
-
         setTimeout(() => {
           state.loading = false
           state.selectedRowKeys = []
@@ -271,11 +295,11 @@
 
       // 添加图片
       const handleChange = (info) => {
+        info.file.status = 'done'
         if (info.file.status === 'uploading') {
           loading.value = true
           return
         }
-
         if (info.file.status === 'done') {
           // Get this url from response in real world.
           getBase64(info.file.originFileObj, (base64Url) => {
@@ -283,17 +307,14 @@
             loading.value = false
           })
         }
-
         if (info.file.status === 'error') {
           loading.value = false
           message.error('upload error')
         }
       }
-
       const beforeUpload = (file) => {
         const isJpgOrPng =
           file.type === 'image/jpeg' || file.type === 'image/png'
-
         if (!isJpgOrPng) {
           message.error('You can only upload JPG file!')
         }
@@ -306,9 +327,31 @@
 
         return isJpgOrPng && isLt2M
       }
-
+      // 自定义文件上传
+      const customRequest = (data) => {
+        const formData = new FormData()
+        formData.append('f1', data.file)
+        upPhotos(formData).then((res) => {
+          formState.user.image = res.data
+        })
+      }
+      // 更新第一页数据
+      function update() {
+        getFirstPage(5).then((res) => {
+          tableData.data = res.data.img_infos
+          pagination.total = res.data.total_num
+        })
+      }
+      function updateOther(pagesize, current) {
+        getPages(pagesize, current).then((res) => {
+          tableData.data = res.data.img_infos
+          pagination.total = res.data.total_num
+        })
+      }
+      // 初始化数据
+      update()
       return {
-        data,
+        tableData,
         columns,
         hasSelected,
         ...toRefs(state),
@@ -333,6 +376,12 @@
         beforeUpload,
         pagination,
         addorchange,
+        customRequest,
+        delOne,
+        update,
+        changePage,
+        nowPage,
+        updateOther,
       }
     },
   })
