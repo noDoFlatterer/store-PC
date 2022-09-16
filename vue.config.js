@@ -61,14 +61,23 @@ module.exports = {
     },
     // 注释掉的地方是前端配置代理访问后端的示例
     proxy: {
-      '/api': {
-        target: 'http://47.92.163.212:8082',
+      '^/api': {
+        target: 'http://47.92.163.212:8080',
         ws: true,
         changeOrigin: true,
         pathRewrite: {
           '^/api': '',
         },
       },
+      // 临时接口
+      // '^/_api': {
+      //   target: 'http://47.92.163.212:8081',
+      //   ws: true,
+      //   changeOrigin: true,
+      //   pathRewrite: {
+      //     '^/_api': '',
+      //   },
+      // },
     },
     after: mockServer(),
   },
