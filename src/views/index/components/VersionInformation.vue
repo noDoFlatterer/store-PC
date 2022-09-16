@@ -10,7 +10,6 @@
     type="success"
     show-icon
   />
-
   <a-card class="version-information">
     <template v-slot:title>系统信息</template>
     <template v-slot:extra>
