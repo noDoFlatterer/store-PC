@@ -8,8 +8,13 @@
       </span>
       <template v-slot:overlay>
         <a-menu>
-          <a-menu-item @click="buy">付费版购买</a-menu-item>
-          <a-menu-item @click="logout">退出登录</a-menu-item>
+          <a-menu-item class="name">登录名</a-menu-item>
+          <a-menu-item class="name">昵称</a-menu-item>
+          <a-menu-item>
+            <a-button @click="logout" type="primary" class="btn">
+              退出登录
+            </a-button>
+          </a-menu-item>
         </a-menu>
       </template>
     </a-dropdown>
@@ -21,9 +26,9 @@
   import { DownOutlined } from '@ant-design/icons-vue'
 
   import { useStore } from 'vuex'
-  import { computed } from 'vue'
+  import { computed, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-
+  // import { getAccount } from '@/api/password'
   export default {
     name: 'VabAvatar',
     components: { DownOutlined },
@@ -40,16 +45,15 @@
           router.push('/login')
         }
       }
-
-      const buy = () => {
-        window.open('http://vue-admin-beautiful.com/authorization/')
-      }
-
+      onMounted(() => {
+        // getAccount().then(res=>{
+        //   console.log(res);
+        // })
+      })
       return {
         avatar: computed(() => store.getters['user/avatar']),
         username: computed(() => store.getters['user/username']),
         logout,
-        buy,
       }
     },
   }
@@ -61,5 +65,11 @@
       min-height: 64px;
       cursor: pointer;
     }
+  }
+  .name {
+    font-size: 10px;
+  }
+  .btn {
+    font-size: 10px;
   }
 </style>

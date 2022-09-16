@@ -16,41 +16,44 @@
       <a-button type="primary" class="add" @click="add">添加</a-button>
 
       <!-- 添加的表单 -->
-      <a-modal v-model:visible="formvisible" :footer="null" title="添加轮播图">
+      <a-modal
+        v-model:visible="formvisible"
+        :footer="null"
+        title="添加轮播图"
+        @cancel="cancel"
+      >
         <a-form
           :model="formState"
           v-bind="layout"
           name="nest-messages"
           :validate-messages="validateMessages"
           @finish="onFinish"
+          ref="formRef"
         >
           <a-form-item
-            :name="['user', 'goodsname']"
+            :name="['user', 'goods_name']"
             label="商品名称"
             :rules="[{ required: true }]"
           >
-            <a-input v-model:value="formState.user.goodsname" />
+            <a-input v-model:value="formState.user.goods_name" />
           </a-form-item>
+
           <a-form-item
-            :name="['user', 'link']"
-            label="跳转链接"
-            :rules="[{ required: true }]"
-          >
-            <a-input v-model:value="formState.user.link" />
-          </a-form-item>
-          <a-form-item
-            :name="['user', 'goodsnumber']"
+            :name="['user', 'goods_id']"
             label="商品编号"
             :rules="[{ required: true }]"
           >
-            <a-input v-model:value="formState.user.goodsnumber" />
+            <a-input-number
+              class="goodsid"
+              v-model:value="formState.user.goods_id"
+            />
           </a-form-item>
           <a-form-item
-            :name="['user', 'sort']"
+            :name="['user', 'sort_num']"
             label="排序值"
             :rules="[{ required: true }]"
           >
-            <a-input v-model:value="formState.user.sort" />
+            <a-input-number v-model:value="formState.user.sort_num" />
           </a-form-item>
           <a-form-item :wrapper-col="{ ...layout.wrapperCol, offset: 8 }">
             <a-button type="primary" html-type="submit">Submit</a-button>
@@ -61,23 +64,17 @@
     <a-table
       :row-selection="rowSelection"
       :columns="columns"
-      :data-source="data"
+      :data-source="data.nowdata"
       :pagination="pagination"
+      :row-key="(record) => record.GoodsID"
+      @change="changePage"
     >
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'link'">
-          <a>
-            {{ record.link }}
-          </a>
-        </template>
-        <template v-else-if="column.key === 'addtime'">
-          <a>
-            {{ record.addtime }}
-          </a>
-        </template>
-        <template v-else-if="column.key === 'action'">
+        <template v-if="column.key === 'action'">
           <a-button type="primary" @click="change(record)">修改</a-button>
-          <a-button type="primary" danger class="del">删除</a-button>
+          <a-button type="primary" danger class="del" @click="delone(record)">
+            删除
+          </a-button>
         </template>
       </template>
     </a-table>
@@ -86,32 +83,29 @@
 
 <script>
   import { computed, defineComponent, reactive, toRefs, ref } from 'vue'
-  import getNowtime from '@/utils/getNowtime'
+  import { getHot, addHot, changeHot, delHots } from '@/api/hot.js'
+  import { message } from 'ant-design-vue'
+
   const columns = [
     {
       title: '商品名称',
-      dataIndex: 'goodsname',
-      key: 'goodsname',
-    },
-    {
-      title: '跳转连接',
-      dataIndex: 'link',
-      key: 'link',
+      dataIndex: 'GoodsName',
+      key: 'GoodsName',
     },
     {
       title: '排序值',
-      dataIndex: 'sort',
-      key: 'sort',
+      dataIndex: 'SortNum',
+      key: 'SortNum',
     },
     {
       title: '商品编号',
-      dataIndex: 'goodsnumber',
-      key: 'goodsnumber',
+      dataIndex: 'GoodsID',
+      key: 'GoodsID',
     },
     {
       title: '添加时间',
-      dataIndex: 'addtime',
-      key: 'addtime',
+      dataIndex: 'CreatedAt',
+      key: 'CreatedAt',
     },
     {
       title: '操作',
@@ -120,71 +114,87 @@
     },
   ]
 
-  const data = reactive([
-    {
-      goodsnumber: 12345,
-      key: '1',
-      action: '',
-      addtime: 32,
-      sort: 1,
-      link: 'www.baidu.com',
-      goodsname: '大别墅',
-    },
-    {
-      goodsnumber: 12345,
-      key: '2',
-      action: '',
-      addtime: 32,
-      sort: 1,
-      link: 'www.baidu.com',
-      goodsname: '大别墅',
-    },
-    {
-      goodsnumber: 12345,
-      key: '3',
-      action: '',
-      addtime: 32,
-      sort: 1,
-      link: 'www.baidu.com',
-      goodsname: '大别墅',
-    },
-  ])
+  const data = reactive({
+    nowdata: [],
+  })
 
   export default defineComponent({
     setup() {
+      const formRef = ref()
       const visible = ref(false)
       const formvisible = ref(false)
+      const addorchange = ref(true)
       const state = reactive({
         selectedRowKeys: [],
         // Check here to configure the default column
         loading: false,
       })
+
       // 表单信息
       const formState = {
         user: {
-          goodsnumber: '',
-          goodsname: '',
-          link: '',
-          sort: 1,
-          addtime: '',
+          goods_name: '',
+          goods_id: '',
+          sort_num: '',
+          Kind: 0,
         },
       }
       // 分页
       const pagination = reactive({
         showLessItems: true,
         showQuickJumper: true,
-        showSizeChanger: true,
+        showSizeChanger: false,
         defaultPageSize: 5,
+        total: 10,
       })
+      // 当前页面
+      const nowPage = ref(1)
+      // 改变页数
+      const changePage = (page) => {
+        nowPage.value = page.current
+        update(page.current)
+        console.log(page)
+      }
       const showModal = () => {
         visible.value = true
       }
+      // 删除一个
+      const delone = (record) => {
+        delHots([record.GoodsID]).then((res) => {
+          message.info(res.msg)
+          state.loading = false
+          state.selectedRowKeys = []
+          // 解决最后一页删除完页面不会跳转问题
+          console.log(nowPage.value, pagination.total)
+          if (
+            pagination.total % 5 == 1 &&
+            Math.floor(pagination.total / 5) == nowPage.value - 1
+          ) {
+            update(nowPage.value - 1)
+          } else {
+            update(nowPage.value)
+          }
+        })
+      }
       // 用来批量删除
-      const handleOk = (e) => {
-        console.log(e)
+      const handleOk = () => {
         visible.value = false
         state.loading = true // ajax request after empty completing
+        delHots(state.selectedRowKeys).then((res) => {
+          message.info(res.msg)
+          state.loading = false
+          state.selectedRowKeys = []
 
+          // 解决最后一页删除完页面不会跳转问题
+          if (
+            pagination.total % 5 == state.selectedRowKeys.length &&
+            pagination.total / 5 == nowPage.value
+          ) {
+            update(nowPage.value - 2)
+          } else {
+            update(nowPage.value)
+          }
+        })
         setTimeout(() => {
           state.loading = false
           state.selectedRowKeys = []
@@ -193,22 +203,27 @@
       // 添加
       const add = () => {
         formvisible.value = true
+        addorchange.value = true
+        // 清空表单
+        formState.user = {}
       }
 
       const hasSelected = computed(() => state.selectedRowKeys.length > 0)
       const rowSelection = {
-        onChange: (selectedRowKeys, selectedRows) => {
-          console.log('选中了', selectedRowKeys, selectedRows)
+        onChange: (selectedRowKeys) => {
           state.selectedRowKeys = selectedRowKeys
         },
       }
-
       // 修改
       const change = (record) => {
         formvisible.value = true
-        console.log(record)
-        formState.user = record
-        console.log(formState.user)
+        addorchange.value = false
+        formState.user = {
+          goods_name: record.GoodsName,
+          goods_id: record.GoodsID,
+          sort_num: record.SortNum,
+          kind: 0,
+        }
       }
       // 表单
       const layout = {
@@ -229,27 +244,55 @@
           range: '${label} must be between ${min} and ${max}',
         },
       }
-
       // 完成提交
-      const onFinish = (values) => {
-        console.log('Success:', values)
-        formvisible.value = false
-        state.loading = true // ajax request after empty completing
-        formState.user.addtime = getNowtime()
-        // 这里需要进行一层深拷贝
-        data.push({ ...formState.user })
+      const onFinish = () => {
+        if (addorchange.value) {
+          // 添加
+          formvisible.value = false
+          state.loading = true // ajax request after empty completing
+
+          addHot(formState.user).then((res) => {
+            message.info(res.msg)
+            update(nowPage.value)
+          })
+          // formRef.value.resetFields
+        } else {
+          // 修改
+          changeHot(formState.user).then((res) => {
+            message.info(res.msg)
+
+            update(nowPage.value)
+          })
+          formvisible.value = false
+
+          state.loading = true // ajax request after empty completing
+        }
         setTimeout(() => {
           state.loading = false
           state.selectedRowKeys = []
         }, 1000)
       }
+      const cancel = () => {
+        formRef.value.resetFields()
+      }
+      // 更新数据
+      function update(page) {
+        getHot({
+          PageNum: page,
+          PageSize: 5,
+          Kind: 0,
+        }).then((res) => {
+          data.nowdata = res.data.HotGoods
+          pagination.total = res.data.Number
+        })
+      }
+      // 初始化数据
+      update(1)
       return {
         data,
         columns,
         hasSelected,
         ...toRefs(state),
-        // func
-
         // onSelectChange,
         visible,
         formvisible,
@@ -262,9 +305,15 @@
         layout,
         validateMessages,
         add,
-        //  分页
+        // 分页
         pagination,
         rowSelection,
+        changePage,
+        update,
+        nowPage,
+        formRef,
+        cancel,
+        delone,
       }
     },
   })
@@ -279,5 +328,8 @@
   }
   .add {
     margin-left: 10px;
+  }
+  .goodsid {
+    width: 150px;
   }
 </style>

@@ -65,7 +65,8 @@
 </template>
 
 <script>
-  import { defineComponent, reactive } from 'vue'
+  import { defineComponent, onMounted, reactive } from 'vue'
+  // import { changeAccount } from '@/api/password'
   export default defineComponent({
     setup() {
       const formState = reactive({
@@ -76,7 +77,6 @@
         oldpassword: '',
         newpassword: '',
       })
-
       const onFinish = (values) => {
         console.log('Success:', values)
       }
@@ -90,7 +90,9 @@
       const onFinishPasswordsFailed = (errorInfo) => {
         console.log('Failed:', errorInfo)
       }
-
+      onMounted(() => {
+        // changeAccount().then
+      })
       return {
         formState,
         onFinish,

@@ -5,7 +5,6 @@ import {
   debounce,
   requestTimeout,
   successCode,
-  tokenName,
 } from '@/config'
 import store from '@/store'
 import qs from 'qs'
@@ -55,7 +54,8 @@ const instance = axios.create({
 instance.interceptors.request.use(
   (config) => {
     if (store.getters['user/accessToken'])
-      config.headers[tokenName] = store.getters['user/accessToken']
+      config.headers['Authorization'] =
+        'Bearer ' + store.getters['user/accessToken']
     if (
       config.data &&
       config.headers['Content-Type'] ===
@@ -91,6 +91,9 @@ instance.interceptors.response.use(
       return data
     } else {
       handleCode(code, msg)
+      if (code == 2005) {
+        console.log('返回到登录页')
+      }
       return Promise.reject(
         'vue-admin-beautiful请求异常拦截:' +
           JSON.stringify({ url: config.url, code, msg }) || 'Error'
