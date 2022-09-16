@@ -52,6 +52,7 @@ export function setAccessToken(accessToken) {
 export function removeAccessToken() {
   if (storage) {
     if ('localStorage' === storage) {
+      console.log('dddddddddddddd')
       return localStorage.removeItem(tokenTableName)
     } else if ('sessionStorage' === storage) {
       return sessionStorage.clear()
