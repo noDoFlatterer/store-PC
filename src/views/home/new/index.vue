@@ -109,7 +109,6 @@
     addNewGoods,
     delNewGoods,
     updateNewGoods,
-    findRecommendGoods,
   } from '@/api/new.js'
   const columns = [
     {
@@ -171,7 +170,7 @@
       })
       //分页查询
       const changePage = (e) => {
-        findRecommendGoods({ page: e.current, size: e.pageSize })
+        findNewGoods({ page: e.current, size: e.pageSize })
           .then(function (res) {
             data.arr = res.data.kind_goods
           })
