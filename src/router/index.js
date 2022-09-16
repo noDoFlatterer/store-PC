@@ -74,36 +74,6 @@ export const asyncRoutes = [
     ],
   },
   {
-    path: '/vab',
-    component: Layout,
-    redirect: '/vab/table',
-    alwaysShow: true,
-    meta: {
-      title: '组件',
-      icon: 'apps-line',
-    },
-    children: [
-      {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/vab/table'),
-        meta: {
-          title: '表格',
-          icon: 'table-2',
-        },
-      },
-      {
-        path: 'icon',
-        name: 'Icon',
-        component: () => import('@/views/vab/icon'),
-        meta: {
-          title: '图标',
-          icon: 'remixicon-line',
-        },
-      },
-    ],
-  },
-  {
     path: '/home',
     component: Layout,
     redirect: '/home/swiper',
