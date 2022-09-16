@@ -1,10 +1,6 @@
-<<<<<<< HEAD
+
 #mall-pc
-=======
-<<<<<<< HEAD
-#mall-pc
-=======
-<<<<<<< HEAD
+
 <div align="center"><img width="200" src="https://gitee.com/chu1204505056/vue-admin-beautiful/raw/master/src/colorfulIcon/svg/vab.svg"/>
 <h1> vue-admin-beautiful（ant-design-vue） </h1>
 </div>
