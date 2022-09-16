@@ -22,6 +22,7 @@ const getters = {
   avatar: (state) => state.avatar,
 }
 const mutations = {
+  removeAccessToken: (state) => (state.accessToken = ''),
   /**
    * @author chuzhixin 1204505056@qq.com
    * @description 设置accessToken

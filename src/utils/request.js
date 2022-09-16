@@ -11,7 +11,8 @@ import qs from 'qs'
 import router from '@/router'
 import { isArray } from '@/utils/validate'
 import { message } from 'ant-design-vue'
-
+import { removeAccessToken } from './accessToken'
+import store_temp from '@/store'
 let loadingInstance
 
 /**
@@ -92,7 +93,11 @@ instance.interceptors.response.use(
     } else {
       handleCode(code, msg)
       if (code == 2005) {
-        console.log('返回到登录页')
+        removeAccessToken()
+        store_temp.commit('user/removeAccessToken')
+        router.push({
+          path: '/',
+        })
       }
       return Promise.reject(
         'vue-admin-beautiful请求异常拦截:' +
