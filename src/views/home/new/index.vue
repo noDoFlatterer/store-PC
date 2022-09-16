@@ -1,65 +1,64 @@
 <template>
   <div>
     <div style="margin-bottom: 16px">
-      <a-button
-        type="primary"
-        danger
-        :disabled="!hasSelected"
-        :loading="loading"
-        @click="showModal"
-      >
+      <a-button type="primary" :disabled="!hasSelected" @click="showModal">
         批量删除
       </a-button>
-      <!-- 确定是否删除 弹出框-->
       <a-modal v-model:visible="visible" @ok="handleOk">
         <p>确定要删除吗</p>
       </a-modal>
       <a-button type="primary" class="add" @click="add">添加</a-button>
 
       <!-- 添加的表单 -->
-      <!-- visible对话框是否可见  -->
-      <a-modal v-model:visible="formvisible" :footer="null" title="修改商品">
-        <!-- name：表单名称，会作为表单字段 id 前缀使用  model：表单名称，会作为表单字段 id 前缀使用   validateTrigger：统一设置字段校验规则-->
+      <a-modal
+        v-model:visible="formvisible"
+        :footer="null"
+        title="添加商品"
+        @cancel="flushForm"
+      >
         <a-form
           :model="formState"
           v-bind="layout"
           name="nest-messages"
-          :validate-messages="validateMessages"
+          :validate-messages="{ required: '${label}不能为空' }"
           @finish="onFinish"
+          ref="editUserFormRef"
         >
-          <!-- name：表单域 model 字段，在使用 validate、resetFields 方法的情况下，该属性是必填的 -->
           <a-form-item
-            :name="['user', 'goodsname']"
+            :name="['user', 'goods_name']"
             label="商品名称"
             :rules="[{ required: true }]"
           >
-            <a-input v-model:value="formState.user.goodsname" />
+            <a-input v-model:value="formState.user.goods_name" />
           </a-form-item>
-
           <a-form-item
-            :name="['user', 'link']"
-            label="跳转链接"
-            :rules="[{ required: true }]"
+            :name="['user', 'goods_id']"
+            label="商品编号"
+            v-if="isWrite"
           >
-            <a-input v-model:value="formState.user.link" />
+            <a-input
+              v-model:value="formState.user.goods_id"
+              :disabled="isWrite"
+            />
           </a-form-item>
-
           <a-form-item
-            :name="['user', 'goodsnumber']"
+            :name="['user', 'goods_id']"
             label="商品编号"
             :rules="[{ required: true }]"
+            v-else-if="!isWrite"
           >
-            <a-input v-model:value="formState.user.goodsnumber" />
+            <a-input
+              v-model:value="formState.user.goods_id"
+              :disabled="isWrite"
+            />
           </a-form-item>
-
           <a-form-item
-            :name="['user', 'sort']"
+            :name="['user', 'sort_num']"
             label="排序值"
             :rules="[{ required: true }]"
           >
-            <a-input v-model:value="formState.user.sort" />
+            <a-input v-model:value="formState.user.sort_num" />
           </a-form-item>
-
           <a-form-item :wrapper-col="{ ...layout.wrapperCol, offset: 8 }">
             <a-button type="primary" html-type="submit">Submit</a-button>
           </a-form-item>
@@ -68,27 +67,27 @@
     </div>
     <a-table
       :row-selection="{
+        //列表项是否可选择
         selectedRowKeys: selectedRowKeys,
-        onChange: onSelectChange,
+        onChange: onSelectChange, //选中项发生变化时的回调
       }"
       :columns="columns"
-      :data-source="data"
+      :data-source="data.arr"
       :pagination="pagination"
+      :rowKey="(record) => record.goods_id"
+      @change="changePage"
     >
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'link'">
+        <template v-if="column.dataIndex === 'created_at'">
           <a>
-            {{ record.link }}
+            {{ record.created_at }}
           </a>
         </template>
-        <template v-else-if="column.key === 'addtime'">
-          <a>
-            {{ record.addtime }}
-          </a>
-        </template>
-        <template v-else-if="column.key === 'action'">
+        <template v-else-if="column.dataIndex === 'action'">
           <a-button type="primary" @click="change(record)">修改</a-button>
-          <a-button type="primary" danger class="del">删除</a-button>
+          <a-button type="primary" danger class="del" @click="showModal">
+            删除
+          </a-button>
         </template>
       </template>
     </a-table>
@@ -96,129 +95,132 @@
 </template>
 
 <script>
-  import { computed, defineComponent, reactive, toRefs, ref } from 'vue'
+  import {
+    computed,
+    defineComponent,
+    reactive,
+    toRefs,
+    ref,
+    onMounted,
+  } from 'vue'
   import getNowtime from '@/utils/getNowtime'
+  import {
+    findNewGoods,
+    addNewGoods,
+    delNewGoods,
+    updateNewGoods,
+    findRecommendGoods,
+  } from '@/api/new.js'
   const columns = [
     {
       title: '商品名称',
-      dataIndex: 'goodsname', //列数据在数据项中对应的路径，支持通过数组查询嵌套路径
-      key: 'goodsname', //Vue 需要的 key，如果已经设置了唯一的 dataIndex，可以忽略这个属性
-    },
-    {
-      title: '跳转连接',
-      dataIndex: 'link',
-      key: 'link',
+      dataIndex: 'goods_name',
     },
     {
       title: '排序值',
-      dataIndex: 'sort',
-      key: 'sort',
+      dataIndex: 'sort_num',
     },
     {
       title: '商品编号',
-      dataIndex: 'goodsnumber',
-      key: 'goodsnumber',
+      dataIndex: 'goods_id',
     },
     {
       title: '添加时间',
-      dataIndex: 'addtime',
-      key: 'addtime',
+      dataIndex: 'created_at',
     },
     {
       title: '操作',
       dataIndex: 'action',
-      key: 'action',
     },
   ]
 
-  const data = reactive([
-    {
-      goodsnumber: 1,
-      key: '1',
-      action: '',
-      addtime: 32,
-      sort: 1,
-      link: 'www.baidu.com',
-      goodsname: '大别墅',
-    },
-    {
-      goodsnumber: 2,
-      key: '2',
-      action: '',
-      addtime: 32,
-      sort: 1,
-      link: 'www.baidu.com',
-      goodsname: '大别墅',
-    },
-    {
-      goodsnumber: 3,
-      key: '3',
-      action: '',
-      addtime: 32,
-      sort: 1,
-      link: 'www.baidu.com',
-      goodsname: '大别墅',
-    },
-  ])
-
   export default defineComponent({
     setup() {
+      //控制是否删除弹窗
       const visible = ref(false)
+
+      let data = reactive({
+        arr: [],
+      })
+      //控制添加弹窗
       const formvisible = ref(false)
+      const isWrite = ref(true)
       const state = reactive({
         selectedRowKeys: [],
-        // Check here to configure the default column
-        loading: false,
       })
       // 表单信息
       const formState = {
         user: {
-          goodsnumber: '',
-          goodsname: '',
-          link: '',
-          sort: 1,
-          addtime: '',
+          goods_id: '',
+          goods_name: '',
+          sort_num: '',
+          created_at: '',
+        },
+        cobyUser: {
+          goods_id: '',
+          goods_name: '',
+          sort_num: '',
+          created_at: '',
         },
       }
       // 分页
       const pagination = reactive({
         showLessItems: true,
-        showQuickJumper: true,
-        showSizeChanger: true,
         defaultPageSize: 5,
+        total: 0,
       })
+      //分页查询
+      const changePage = (e) => {
+        findRecommendGoods({ page: e.current, size: e.pageSize })
+          .then(function (res) {
+            data.arr = res.data.kind_goods
+          })
+          .catch(function (error) {
+            console.log(error)
+          })
+          .then(function () {})
+      }
+
+      //展示受否删除框
       const showModal = () => {
         visible.value = true
       }
       // 用来批量删除
-      const handleOk = (e) => {
-        console.log(e)
+      const handleOk = () => {
         visible.value = false
-        state.loading = true // ajax request after empty completing
-
+        delNewGoods({ goods_ids: state.selectedRowKeys })
+          .then(function (res) {
+            console.log(res)
+          })
+          .catch(function (error) {
+            console.log(error)
+          })
+          .then(function () {
+            finddata()
+          })
+        console.log(state.selectedRowKeys)
         setTimeout(() => {
-          state.loading = false
           state.selectedRowKeys = []
         }, 1000)
       }
-      // 添加
+      // 添加推荐商品
       const add = () => {
         formvisible.value = true
+        isWrite.value = false
       }
 
+      //控制批量删除是否可使用
       const hasSelected = computed(() => state.selectedRowKeys.length > 0)
 
+      //选中删除的元素
       const onSelectChange = (selectedRowKeys) => {
-        console.log('选中了', selectedRowKeys)
-
         state.selectedRowKeys = selectedRowKeys
       }
       // 修改
       const change = (record) => {
         formvisible.value = true
-        console.log(record)
-        formState.user = record
-        console.log(formState.user)
+        formState.cobyUser = record
+        isWrite.value = true
       }
 
       // 表单
@@ -230,63 +232,101 @@
           span: 16,
         },
       }
-      const validateMessages = {
-        required: '${label} is required!',
-        types: {
-          email: '${label} is not a valid email!',
-          number: '${label} is not a valid number!',
-        },
-        number: {
-          range: '${label} must be between ${min} and ${max}',
-        },
+
+      //退出表单时刷新
+      const editUserFormRef = ref()
+      const flushForm = () => {
+        editUserFormRef.value.resetFields()
       }
 
       // 完成提交
       const onFinish = (values) => {
-        console.log('Success:', values)
         formvisible.value = false
-        state.loading = true // ajax request after empty completing
-        formState.user.addtime = getNowtime()
-        // 这里需要进行深拷贝
-        data.push({ ...formState.user })
+        formState.user.created_at = getNowtime()
+        //拷贝值
+        let nowData = { ...formState.cobyUser }
+        if (isWrite.value === false) {
+          addNewGoods({
+            goods_name: values.user.goods_name,
+            goods_id: Number(values.user.goods_id),
+            sort_num: Number(values.user.sort_num),
+          })
+            .then(function (res) {
+              console.log(res)
+            })
+            .catch(function (error) {
+              console.log(error)
+            })
+            .then(function () {
+              finddata()
+            })
+        } else {
+          updateNewGoods({
+            goods_name: values.user.goods_name,
+            goods_id: Number(nowData.goods_id),
+            sort_num: Number(values.user.sort_num),
+          })
+            .then(function (res) {
+              console.log(res)
+            })
+            .catch(function (error) {
+              console.log(error)
+            })
+            .then(function () {
+              finddata()
+            })
+        }
         setTimeout(() => {
-          state.loading = false
           state.selectedRowKeys = []
+          formState.user = {}
         }, 1000)
       }
+
+      //请求数据方法
+      const finddata = () => {
+        findNewGoods({ page: 1, size: pagination.defaultPageSize })
+          .then(function (res) {
+            data.arr = res.data.kind_goods
+            pagination.total = res.data.size
+            console.log(res)
+          })
+          .catch(function (error) {
+            console.log(error)
+          })
+          .then(function () {})
+      }
+      onMounted(() => {
+        finddata()
+      })
       return {
         data,
         columns,
         hasSelected,
         ...toRefs(state),
-        // func
-
         onSelectChange,
         visible,
         formvisible,
+        isWrite,
         showModal,
         handleOk,
         change,
-        //表单
         formState,
         onFinish,
         layout,
-        validateMessages,
         add,
-        //  分页
         pagination,
+        changePage,
+        editUserFormRef,
+        flushForm,
       }
     },
   })
 </script>
 <style>
-  img {
-    height: 100px;
-    width: 100px;
-  }
   .del {
     margin-left: 10px;
   }
+
   .add {
     margin-left: 10px;
   }

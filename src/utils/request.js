@@ -5,7 +5,6 @@ import {
   debounce,
   requestTimeout,
   successCode,
-  tokenName,
 } from '@/config'
 import store from '@/store'
 import qs from 'qs'
@@ -41,7 +40,7 @@ const handleCode = (code, msg) => {
  * @description axios初始化
  */
 const instance = axios.create({
-  // baseURL: 'http://localhost:9999',
+  // baseURL: '/api',
   timeout: requestTimeout,
   headers: {
     'Content-Type': contentType,
@@ -55,7 +54,8 @@ const instance = axios.create({
 instance.interceptors.request.use(
   (config) => {
     if (store.getters['user/accessToken'])
-      config.headers[tokenName] = store.getters['user/accessToken']
+      config.headers['Authorization'] =
+        'Bearer ' + store.getters['user/accessToken']
     if (
       config.data &&
       config.headers['Content-Type'] ===

@@ -71,15 +71,6 @@ export const asyncRoutes = [
           icon: 'table-2',
         },
       },
-      {
-        path: 'dashboard',
-        name: 'Dashboard',
-        component: () => import('@/views/Dashboard/dashboard'),
-        meta: {
-          title: 'Dashboard',
-          icon: 'remixicon-line',
-        },
-      },
     ],
   },
   {

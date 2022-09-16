@@ -3,17 +3,17 @@
     <a-row :gutter="16" style="padding: 20px">
       <a-col :span="8">
         <a-card title="今日订单数" :bordered="false" class="da_card">
-          <p>card content</p>
+          <p>{{ option.series[3].data[6] }}</p>
         </a-card>
       </a-col>
       <a-col :span="8">
         <a-card title="今日日活" :bordered="false" class="da_card">
-          <p>card content</p>
+          <p>{{ option.series[2].data[6] }}</p>
         </a-card>
       </a-col>
       <a-col :span="8">
         <a-card title="转化率" :bordered="false" class="da_card">
-          <p>card content</p>
+          <p>{{ ConversionRate }}</p>
         </a-card>
       </a-col>
     </a-row>
@@ -22,9 +22,8 @@
 </template>
 <script>
   import * as echarts from 'echarts'
-  // import axios from 'axios'
   import { getDashboard } from '@/api/dashboard.js'
-  import { onMounted, reactive } from '@vue/runtime-core'
+  import { onMounted, reactive, computed } from '@vue/runtime-core'
 
   export default {
     setup() {
@@ -84,7 +83,7 @@
             emphasis: {
               focus: 'series',
             },
-            data: [120, 132, 101, 134, 90, 230, 210],
+            data: [],
           },
           {
             name: '付费用户',
@@ -94,7 +93,7 @@
             emphasis: {
               focus: 'series',
             },
-            data: [220, 182, 191, 234, 290, 330, 310],
+            data: [],
           },
           {
             name: '活跃用户',
@@ -104,7 +103,7 @@
             emphasis: {
               focus: 'series',
             },
-            data: [150, 232, 201, 154, 190, 330, 410],
+            data: [],
           },
           {
             name: '订单数',
@@ -114,7 +113,7 @@
             emphasis: {
               focus: 'series',
             },
-            data: [320, 332, 301, 334, 390, 330, 320],
+            data: [],
           },
           {
             name: '当月总收入',
@@ -128,28 +127,42 @@
             emphasis: {
               focus: 'series',
             },
-            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            data: [],
           },
         ],
+      })
+      let ConversionRate = computed(() => {
+        let Rate = Math.trunc(
+          (option.series[1].data[6] / option.series[2].data[6]) * 100
+        )
+        if (!Rate) {
+          return 0
+        }
+        return Rate
       })
 
       onMounted(() => {
         var chartDom = document.getElementById('main')
         var myChart = echarts.init(chartDom)
-        option && myChart.setOption(option)
         getDashboard()
           .then(function (response) {
-            // 处理成功情况
-            console.log(response)
+            option.series[0].data = response.data.registers
+            option.series[1].data = response.data.pay_users
+            option.series[2].data = response.data.login_user
+            option.series[3].data = response.data.orders
+            option.series[4].data = response.data.incomes
           })
           .catch(function (error) {
-            // 处理错误情况
             console.log(error)
           })
           .then(function () {
-            // 总是会执行
+            option && myChart.setOption(option)
           })
       })
+      return {
+        option,
+        ConversionRate,
+      }
     },
   }
 </script>
