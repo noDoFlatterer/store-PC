@@ -40,7 +40,7 @@ const handleCode = (code, msg) => {
  * @description axios初始化
  */
 const instance = axios.create({
-  // baseURL: 'http://localhost:9999',
+  // baseURL: '/api',
   timeout: requestTimeout,
   headers: {
     'Content-Type': contentType,
