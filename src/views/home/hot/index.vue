@@ -66,7 +66,7 @@
       :columns="columns"
       :data-source="data.nowdata"
       :pagination="pagination"
-      :row-key="(record) => record.GoodsID"
+      :row-key="(record) => record.goods_id"
       @change="changePage"
     >
       <template #bodyCell="{ column, record }">
@@ -89,23 +89,19 @@
   const columns = [
     {
       title: '商品名称',
-      dataIndex: 'GoodsName',
-      key: 'GoodsName',
+      dataIndex: 'goods_name',
     },
     {
       title: '排序值',
-      dataIndex: 'SortNum',
-      key: 'SortNum',
+      dataIndex: 'sort_num',
     },
     {
       title: '商品编号',
-      dataIndex: 'GoodsID',
-      key: 'GoodsID',
+      dataIndex: 'goods_id',
     },
     {
       title: '添加时间',
-      dataIndex: 'CreatedAt',
-      key: 'CreatedAt',
+      dataIndex: 'created_at',
     },
     {
       title: '操作',
@@ -160,12 +156,11 @@
       }
       // 删除一个
       const delone = (record) => {
-        delHots([record.GoodsID]).then((res) => {
+        delHots([record.goods_id]).then((res) => {
           message.info(res.msg)
           state.loading = false
           state.selectedRowKeys = []
           // 解决最后一页删除完页面不会跳转问题
-          console.log(nowPage.value, pagination.total)
           if (
             pagination.total % 5 == 1 &&
             Math.floor(pagination.total / 5) == nowPage.value - 1
@@ -284,6 +279,7 @@
         }).then((res) => {
           data.nowdata = res.data.HotGoods
           pagination.total = res.data.Number
+          console.log(res)
         })
       }
       // 初始化数据
