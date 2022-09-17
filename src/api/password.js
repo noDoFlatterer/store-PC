@@ -7,7 +7,7 @@ import request from '@/utils/request'
 export function changeAccount(data) {
   return request({
     url: '/api/api/v1/goods/modifyAcc',
-    method: 'put',
+    method: 'post',
     data,
   })
 }
@@ -19,7 +19,7 @@ export function changeAccount(data) {
 export function changePassword(data) {
   return request({
     url: '/api/api/v1/goods/modifyPwd',
-    method: 'put',
+    method: 'post',
     data,
   })
 }
@@ -31,6 +31,6 @@ export function changePassword(data) {
 export function getAccount() {
   return request({
     url: '/api/api/v1/goods/getCurrentAcc',
-    method: 'get',
+    method: 'post',
   })
 }
