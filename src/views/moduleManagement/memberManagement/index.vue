@@ -33,9 +33,9 @@
   let page = 1
   // 分页配置项
   const pagination = reactive({
-    showLessItems: true,
-    showQuickJumper: true,
-    showSizeChanger: true,
+    showLessItems: false,
+    showQuickJumper: false,
+    showSizeChanger: false,
     // defaultPageSize: 5,
   })
   let check_vip_data = ref([])

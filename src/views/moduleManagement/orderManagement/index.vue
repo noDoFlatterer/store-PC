@@ -142,9 +142,9 @@
       let status_kind = 5
       // 分页配置项
       const pagination = reactive({
-        showLessItems: true,
-        showQuickJumper: true,
-        showSizeChanger: true,
+        showLessItems: false,
+        showQuickJumper: false,
+        showSizeChanger: false,
         defaultPageSize: 5,
       })
       //类别

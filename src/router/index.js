@@ -210,7 +210,7 @@ export const asyncRoutes = [
         meta: {
           title: '修改密码',
           icon: 'home-4-line',
-          affix: true,
+          affix: false,
         },
       },
     ],
