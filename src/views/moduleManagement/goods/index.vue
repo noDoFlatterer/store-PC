@@ -1,40 +1,52 @@
 <template>
   <div>
-    <a-button @click="toAddUp()" type="primary" danger>+增加商品</a-button>
+    <a-button @click="toAddUp()" type="primary" danger href="javascript:;">
+      增加商品
+    </a-button>
     <a-table
+      href="javascript:;"
       :row-selection="rowSelection"
       :columns="columns"
-      :data-source="data"
+      :data-source="data.arr"
+      :pagination="pagination"
+      @change="changePag"
     >
-      <template #bodyCell="{ column, text, record }">
-        <template v-if="column.dataIndex === 'name'">
-          <a>{{ text }}</a>
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.dataIndex === 'image'">
+          <img :src="record.image" class="image , pic" />
         </template>
-        <template v-if="column.dataIndex === 'state'">
-          <div v-if="record.state">
-            <a>{{ '销售中' }}</a>
+        <template v-if="column.dataIndex === 'status'">
+          <div v-if="record.status === 1">
+            <span>{{ '销售中' }}</span>
           </div>
           <div v-else>
-            <a style="color: red">{{ '已下架' }}</a>
+            <span style="color: red">{{ '已下架' }}</span>
           </div>
         </template>
+
         <template v-if="column.dataIndex === 'done'">
-          <a-radio-group>
+          <a-radio-group href="javascript:;">
             <a-radio-button
-              v-if="record.state"
-              @click="changeState(record.key)"
+              href="javascript:;"
+              v-if="record.status === 1"
+              @click="changeState(record.goods_id, record.status)"
               value="small"
             >
               下架
             </a-radio-button>
             <a-radio-button
+              href="javascript:;"
               v-else
-              @click="changeState(record.key)"
+              @click="changeState(record.goods_id, record.status)"
               value="small"
             >
               上架
             </a-radio-button>
-            <a-radio-button @click="toAdd(record)" value="small">
+            <a-radio-button
+              @click="toAdd(record)"
+              value="small"
+              href="javascript:;"
+            >
               修改
             </a-radio-button>
           </a-radio-group>
@@ -44,86 +56,85 @@
   </div>
 </template>
 <script>
-  import { defineComponent, ref } from 'vue'
+  import { alterStatus, firstPage, nextPage } from '@/api/goods'
+  import { defineComponent, reactive, toRaw } from 'vue'
   import { useRouter } from 'vue-router'
-  const columns = [
-    {
-      title: '商品编号',
-      dataIndex: 'id',
-    },
-    {
-      title: '商品名',
-      dataIndex: 'name',
-    },
-    {
-      title: '商品简介',
-      dataIndex: 'introduction',
-    },
-    {
-      title: '商品图片',
-      dataIndex: 'pic',
-    },
-    {
-      title: '商品库存',
-      dataIndex: 'inventory',
-    },
-    {
-      title: '商品售价',
-      dataIndex: 'price',
-    },
-    {
-      title: '上架状态',
-      dataIndex: 'state',
-    },
-    {
-      title: '操作',
-      dataIndex: 'done',
-    },
-  ]
-  const data = ref([
-    {
-      key: '1',
-      id: '123456',
-      name: '哈哈哈',
-      introduction: '贩卖快乐',
-      pic: 32,
-      inventory: '100',
-      price: '10',
-      state: true,
-    },
-    {
-      key: '2',
-      id: '123456',
-      name: '哈哈哈',
-      introduction: '贩卖快乐',
-      pic: 32,
-      inventory: '100',
-      price: '10',
-      state: false,
-    },
-  ])
+  import store from '@/store'
+
   export default defineComponent({
     setup() {
+      // 表单配置
       const rowSelection = {
-        onChange: (selectedRowKeys, selectedRows) => {
-          console.log(
-            `selectedRowKeys: ${selectedRowKeys}`,
-            'selectedRows: ',
-            selectedRows
-          )
-        },
         getCheckboxProps: (record) => ({
           disabled: record.name === 'Disabled User',
-          // Column configuration not to be checked
           name: record.name,
         }),
       }
-      const changeState = (key) => {
-        let date = data.value.filter((item) => item.key === key)
-        date[0].state = !date[0].state
+      // 表单每行的表头
+      const columns = [
+        {
+          title: '商品编号',
+          dataIndex: 'goods_id',
+        },
+        {
+          title: '商品名',
+          dataIndex: 'goods_name',
+        },
+        {
+          title: '商品简介',
+          dataIndex: 'introduce',
+        },
+        {
+          title: '商品图片',
+          dataIndex: 'image',
+        },
+        {
+          title: '商品库存',
+          dataIndex: 'count',
+        },
+        {
+          title: '商品售价',
+          dataIndex: 'price',
+        },
+        {
+          title: '上架状态',
+          dataIndex: 'status',
+        },
+        {
+          title: '操作',
+          dataIndex: 'done',
+        },
+      ]
+      // 动态数据
+      const data = reactive({
+        arr: [],
+      })
+      // 请求函数  (刷新页面就调用)
+      const getData = () => {
+        firstPage(5).then((value) => {
+          data.arr = value.data.page
+          pagination.total = value.data.numsOfAllData
+        })
+      }
+      getData()
+
+      // 修改商品状态(上架下架)
+      const changeState = (key, status) => {
+        const goods_id = '' + key
+        const obj = {
+          goods_id: goods_id,
+          status: status,
+        }
+        alterStatus(obj).then(() => {
+          getData()
+        })
       }
       var router = useRouter()
+
+      // 修改商品  (跳转带数据)
       const toAdd = (record) => {
+        const obj = toRaw(record)
+        store.commit('goods/changeUser', obj)
         router.push({
           name: 'add',
           query: {
@@ -131,16 +142,37 @@
           },
         })
       }
+      // 添加商品  (跳转不带数据)
       const toAddUp = () => {
+        store.commit('goods/changeUser', '')
         router.push({
           name: 'add',
         })
       }
-      return {
-        data,
-        columns,
-        rowSelection,
 
+      // 分页配置项
+      const pagination = reactive({
+        showLessItems: true,
+        showQuickJumper: true,
+        showSizeChanger: true,
+        defaultPageSize: 5,
+        total: 0,
+      })
+
+      // 下一页调接口
+      const changePag = (e) => {
+        const page = e.current
+        nextPage(page, 5).then((value) => {
+          data.arr = value.data.page
+        })
+      }
+
+      return {
+        columns,
+        changePag,
+        data,
+        rowSelection,
+        pagination,
         // fun
         changeState,
         toAdd,
@@ -149,3 +181,10 @@
     },
   })
 </script>
+
+<style>
+  .pic {
+    widows: 100px;
+    height: 100px;
+  }
+</style>
