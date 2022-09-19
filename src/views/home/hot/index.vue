@@ -177,9 +177,6 @@
         state.loading = true // ajax request after empty completing
         delHots(state.selectedRowKeys).then((res) => {
           message.info(res.msg)
-          state.loading = false
-          state.selectedRowKeys = []
-
           // 解决最后一页删除完页面不会跳转问题
           if (
             pagination.total % 5 == state.selectedRowKeys.length &&
@@ -189,6 +186,7 @@
           } else {
             update(nowPage.value)
           }
+          state.selectedRowKeys = []
         })
         setTimeout(() => {
           state.loading = false
@@ -214,9 +212,9 @@
         formvisible.value = true
         addorchange.value = false
         formState.user = {
-          goods_name: record.GoodsName,
-          goods_id: record.GoodsID,
-          sort_num: record.SortNum,
+          goods_name: record.goods_name,
+          goods_id: record.goods_id,
+          sort_num: record.sort_num,
           kind: 0,
         }
       }
