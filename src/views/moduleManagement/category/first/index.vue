@@ -186,10 +186,8 @@
       // 呼出新增表单
       const showInput = () => {
         addOrChange = true
-
         formState.user.class_name = ''
         formState.user.sort_num = ''
-
         formvisible.value = true
       }
 

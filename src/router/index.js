@@ -134,11 +134,44 @@ export const asyncRoutes = [
       {
         path: 'category',
         name: 'category',
-        component: () => import('@/views/moduleManagement/category'),
         meta: {
           title: '分类管理',
-          icon: 'apps-line',
+          icon: 'table-2',
         },
+        children: [
+          {
+            path: '',
+            name: 'firstCategory',
+            hidden: true,
+            component: () => import('@/views/moduleManagement/category/first'),
+            meta: {
+              title: '分类管理',
+              icon: 'table-2',
+            },
+          },
+          {
+            path: 'second',
+            name: 'secondCategory',
+            hidden: true,
+            component: () => import('@/views/moduleManagement/category/second'),
+            meta: {
+              title: '分类二级管理',
+              icon: 'table-2',
+            },
+          },
+          {
+            path: 'third',
+            name: 'thirdCategory',
+            hidden: true,
+            component: () =>
+              import('@/views/moduleManagement/category/third'),
+            meta: {
+              title: '分类三级管理',
+              icon: 'table-2',
+              tagHidden: true,
+            },
+          },
+        ],
       },
       {
         path: 'goods',
