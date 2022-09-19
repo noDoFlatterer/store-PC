@@ -163,8 +163,7 @@ export const asyncRoutes = [
             path: 'third',
             name: 'thirdCategory',
             hidden: true,
-            component: () =>
-              import('@/views/moduleManagement/category/third'),
+            component: () => import('@/views/moduleManagement/category/third'),
             meta: {
               title: '分类三级管理',
               icon: 'table-2',

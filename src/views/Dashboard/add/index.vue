@@ -202,16 +202,16 @@
       }
 
       const handleFinish = () => {
-        console.log(formState,'formState');
+        console.log(formState, 'formState')
         const proxyObj = formState.user.category
-        console.log(proxyObj,'proxyObj');
+        console.log(proxyObj, 'proxyObj')
         let objString = ''
-        for(let i in proxyObj){
-          console.log(proxyObj[i],'1111111');
-          objString = objString  + proxyObj[i] + '/'
+        for (let i in proxyObj) {
+          console.log(proxyObj[i], '1111111')
+          objString = objString + proxyObj[i] + '/'
         }
-        console.log(objString,'迭代之后');
-        formState.user.category=objString
+        console.log(objString, '迭代之后')
+        formState.user.category = objString
         addGoods(formState.user).then((value) => {
           console.log(value, '提交成功')
         })
