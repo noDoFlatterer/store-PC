@@ -1,7 +1,10 @@
 <template>
   <div>
     <div>
-      <a-button @click="showInput()" type="primary" href="javascript:;">
+      <a-button @click="goBack()" type="primary" class="add">
+        返回上一级
+      </a-button>
+      <a-button @click="showInput()" type="primary" class="add">
         增加商品
       </a-button>
       <a-button
@@ -11,7 +14,6 @@
         :loading="loading"
         @click="deleteAll"
         class="add"
-        href="javascript:;"
       >
         批量删除
       </a-button>
@@ -23,7 +25,6 @@
         class="add"
       >
         <a-form
-          href="javascript:;"
           :model="formState"
           v-bind="layout"
           name="nest-messages"
@@ -58,16 +59,13 @@
             href="javascript:;"
             :wrapper-col="{ offset: 8, span: 16 }"
           >
-            <a-button type="primary" html-type="submit" href="javascript:;">
-              提交
-            </a-button>
+            <a-button type="primary" html-type="submit">提交</a-button>
           </a-form-item>
         </a-form>
       </a-modal>
     </div>
 
     <a-table
-      href="javascript:;"
       :row-selection="rowSelection"
       :columns="columns"
       :data-source="data.arr"
@@ -77,26 +75,11 @@
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'done'">
-          <a-radio-group href="javascript:;">
-            <a-radio-button
-              @click="change(record)"
-              value="small"
-              href="javascript:;"
-            >
+          <a-radio-group>
+            <a-radio-button @click="change(record)" value="small">
               修改
             </a-radio-button>
-            <a-radio-button
-              @click="next(record)"
-              value="small"
-              href="javascript:;"
-            >
-              下级分类
-            </a-radio-button>
-            <a-radio-button
-              @click="deleteOne(record)"
-              value="small"
-              href="javascript:;"
-            >
+            <a-radio-button @click="deleteOne(record)" value="small">
               删除
             </a-radio-button>
           </a-radio-group>
@@ -108,7 +91,7 @@
 <script>
   import { addData, find, deleteData, update } from '@/api/category'
   import { computed, defineComponent, ref, reactive, toRefs } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { useRouter, useRoute } from 'vue-router'
 
   export default defineComponent({
     setup() {
@@ -116,7 +99,9 @@
       // 请求数据
       const getData = (obj) => {
         find(obj).then((value) => {
-          data.arr = value.data.Categories
+          if (value.data.Categories) {
+            data.arr = value.data.Categories
+          }
           pagination.total = value.data.Number
         })
       }
@@ -126,12 +111,14 @@
           getData(firstObj)
         })
       }
+      // 路由传来的数据
+      const route = useRoute()
 
       const firstObj = {
         Page: 1,
-        PreName: '无',
+        PreName: route.query.name,
         Size: 5,
-        PreCategory: 0,
+        PreCategory: 2,
       }
       getData(firstObj)
 
@@ -203,37 +190,14 @@
         formvisible.value = true
       }
 
-      // 表单
-      const showModal = () => {
-        visible.value = true
-      }
-      const layout = {
-        labelCol: {
-          span: 8,
-        },
-        wrapperCol: {
-          span: 16,
-        },
-      }
-      const validateMessages = {
-        required: '${label} is required!',
-        types: {
-          email: '${label} is not a valid email!',
-          number: '${label} is not a valid number!',
-        },
-        number: {
-          range: '${label} must be between ${min} and ${max}',
-        },
-      }
-
       // 完成提交
       const onFinish = (values) => {
         formvisible.value = false //收起来弹出框
         if (addOrChange.value) {
           const obj = {
             class_name: values.user.class_name,
-            pre_name: '无',
-            cur_category: 1,
+            pre_name: route.query.name,
+            cur_category: 3,
             sort_num: Number(values.user.sort_num),
           }
           addData(obj).then(() => {
@@ -243,7 +207,7 @@
           const obj = {
             name: values.user.class_name,
             pre_name: oldData.user.class_name,
-            cur_category: 1,
+            cur_category: 3,
             sort_num: Number(values.user.sort_num),
           }
           update(obj).then(() => {
@@ -254,14 +218,15 @@
 
       // 删除单个
       const deleteOne = (record) => {
-        const arr = [record.Id]
-        deleteOther(arr)
+        const arrId = [record.Id]
+        deleteOther(arrId)
       }
       // 用来批量删除
       const deleteAll = () => {
         deleteOther(state.selectedRowKeys)
       }
 
+      // 复选框的选中与否
       const hasSelected = computed(() => state.selectedRowKeys.length > 0)
       const rowSelection = {
         onChange: (selectedRowKeys) => {
@@ -285,19 +250,39 @@
           PreCategory: 0,
         }
         find(obj, 5).then((value) => {
-          data.arr = value.data.Categories
+          if ((data.arr = value.data.Categories)) {
+            data.arr = value.data.Categories
+          }
         })
       }
 
       // 路由跳转
       var router = useRouter()
-      const next = (record) => {
-        router.push({
-          name: 'secondCategory',
-          query: {
-            name: record.ClassName,
-          },
-        })
+      const goBack = () => {
+        router.back()
+      }
+
+      // 表单 静态配置
+      const showModal = () => {
+        visible.value = true
+      }
+      const layout = {
+        labelCol: {
+          span: 8,
+        },
+        wrapperCol: {
+          span: 16,
+        },
+      }
+      const validateMessages = {
+        required: '${label} is required!',
+        types: {
+          email: '${label} is not a valid email!',
+          number: '${label} is not a valid number!',
+        },
+        number: {
+          range: '${label} must be between ${min} and ${max}',
+        },
       }
 
       return {
@@ -320,7 +305,7 @@
         rowSelection,
         changePag,
         // 跳转
-        next,
+        goBack,
         // 删除
         deleteOne,
         deleteAll,
