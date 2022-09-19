@@ -233,9 +233,9 @@
           return
         }
         if (info.file.status === 'done') {
-          // Get this url from response in real world.
           getBase64(info.file.originFileObj, (base64Url) => {
             imageUrl.value = base64Url
+            console.log(imageUrl.value,'.value.value');
             loading.value = false
           })
         }
@@ -264,7 +264,7 @@
       }
       // 自定义文件上传
       const customRequest = (data) => {
-        console.log(data)
+        // console.log(data)
         const formData = new FormData()
         formData.append('f1', data.file)
         uploadImg(formData).then((res) => {

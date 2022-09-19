@@ -19,7 +19,6 @@
       </a-button>
       <!-- 表单 -->
       <a-modal
-        href="javascript:;"
         v-model:visible="formvisible"
         title="添加分类"
         class="add"
@@ -32,31 +31,26 @@
           @finish="onFinish"
         >
           <a-form-item
-            href="javascript:;"
             label="分类名称"
             :name="['user', 'class_name']"
             :rules="[{ required: true }]"
           >
             <a-input
-              href="javascript:;"
               v-model:value="formState.user.class_name"
             />
           </a-form-item>
 
           <a-form-item
-            href="javascript:;"
             label="排序值"
             :name="['user', 'sort_num']"
             :rules="[{ required: true }]"
           >
             <a-input
-              href="javascript:;"
               v-model:value="formState.user.sort_num"
             />
           </a-form-item>
 
           <a-form-item
-            href="javascript:;"
             :wrapper-col="{ offset: 8, span: 16 }"
           >
             <a-button type="primary" html-type="submit">提交</a-button>
