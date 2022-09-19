@@ -190,18 +190,18 @@
         delPhotos([...state.selectedRowKeys]).then((res) => {
           message.info(res.data)
           state.loading = false
-          state.selectedRowKeys = []
           if (nowPage.value == 1) {
             update()
             // 解决最后一页删除完页面不会跳转问题
           } else if (
             pagination.total % 5 == state.selectedRowKeys.length &&
-            pagination.total / 5 == nowPage.value
+            Math.floor(pagination.total / 5) == nowPage.value - 1
           ) {
             updateOther(5, nowPage.value - 1)
           } else {
             updateOther(5, nowPage.value)
           }
+          state.selectedRowKeys = []
         })
       }
       // 删除一个
