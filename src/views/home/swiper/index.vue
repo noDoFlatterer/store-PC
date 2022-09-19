@@ -75,7 +75,7 @@
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'img'">
-          <img :src="record.img" alt="" srcset="" />
+          <img :src="record.image" alt="" srcset="" />
         </template>
         <template v-else-if="column.key === 'addtime'">
           <a>

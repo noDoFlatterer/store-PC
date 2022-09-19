@@ -3,7 +3,7 @@ import { tokenName } from '@/config'
 
 export async function login(data) {
   return request({
-    url: '/api/login',
+    url: '/api/logina',
     method: 'post',
     data,
   })
