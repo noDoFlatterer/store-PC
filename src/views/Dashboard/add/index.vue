@@ -201,10 +201,18 @@
         },
       }
 
-      const handleFinish = (values) => {
-        console.log(values, formState)
-        console.log(values.user, '1111111')
-        addGoods(values.user).then((value) => {
+      const handleFinish = () => {
+        console.log(formState, 'formState')
+        const proxyObj = formState.user.category
+        console.log(proxyObj, 'proxyObj')
+        let objString = ''
+        for (let i in proxyObj) {
+          console.log(proxyObj[i], '1111111')
+          objString = objString + proxyObj[i] + '/'
+        }
+        console.log(objString, '迭代之后')
+        formState.user.category = objString
+        addGoods(formState.user).then((value) => {
           console.log(value, '提交成功')
         })
       }
@@ -225,9 +233,9 @@
           return
         }
         if (info.file.status === 'done') {
-          // Get this url from response in real world.
           getBase64(info.file.originFileObj, (base64Url) => {
             imageUrl.value = base64Url
+            console.log(imageUrl.value, '.value.value')
             loading.value = false
           })
         }
@@ -256,7 +264,7 @@
       }
       // 自定义文件上传
       const customRequest = (data) => {
-        console.log(data)
+        // console.log(data)
         const formData = new FormData()
         formData.append('f1', data.file)
         uploadImg(formData).then((res) => {

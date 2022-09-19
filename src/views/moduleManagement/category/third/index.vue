@@ -18,12 +18,7 @@
         批量删除
       </a-button>
       <!-- 表单 -->
-      <a-modal
-        href="javascript:;"
-        v-model:visible="formvisible"
-        title="添加分类"
-        class="add"
-      >
+      <a-modal v-model:visible="formvisible" title="添加分类" class="add">
         <a-form
           :model="formState"
           v-bind="layout"
@@ -32,33 +27,22 @@
           @finish="onFinish"
         >
           <a-form-item
-            href="javascript:;"
             label="分类名称"
             :name="['user', 'class_name']"
             :rules="[{ required: true }]"
           >
-            <a-input
-              href="javascript:;"
-              v-model:value="formState.user.class_name"
-            />
+            <a-input v-model:value="formState.user.class_name" />
           </a-form-item>
 
           <a-form-item
-            href="javascript:;"
             label="排序值"
             :name="['user', 'sort_num']"
             :rules="[{ required: true }]"
           >
-            <a-input
-              href="javascript:;"
-              v-model:value="formState.user.sort_num"
-            />
+            <a-input v-model:value="formState.user.sort_num" />
           </a-form-item>
 
-          <a-form-item
-            href="javascript:;"
-            :wrapper-col="{ offset: 8, span: 16 }"
-          >
+          <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
             <a-button type="primary" html-type="submit">提交</a-button>
           </a-form-item>
         </a-form>
@@ -172,7 +156,7 @@
       let addOrChange = ref(true) // 最好不要用 reactive，reactive里面尽量不写布尔值，会报警告
       // 呼出新增表单
       const showInput = () => {
-        addOrChange = true
+        addOrChange.value = true
 
         formState.user.class_name = ''
         formState.user.sort_num = ''
@@ -182,7 +166,7 @@
 
       // 修改
       const change = (record) => {
-        addOrChange = false
+        addOrChange.value = false
         oldData.user.class_name = record.ClassName
         oldData.user.sort_num = record.SortNum
         formState.user.class_name = record.ClassName
