@@ -206,6 +206,7 @@
       const add = () => {
         formvisible.value = true
         isWrite.value = false
+        formState.user = {}
       }
 
       //控制批量删除是否可使用
@@ -220,6 +221,9 @@
         formvisible.value = true
         formState.cobyUser = record
         isWrite.value = true
+        formState.user.goods_name = record.goods_name
+        formState.user.sort_num = record.sort_num
+        formState.user.goods_id = record.goods_id
       }
 
       // 表单
