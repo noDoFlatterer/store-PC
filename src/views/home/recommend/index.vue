@@ -209,6 +209,7 @@
       const add = () => {
         formvisible.value = true
         isWrite.value = false
+        formState.user = {}
       }
 
       const editUserFormRef = ref()
@@ -228,6 +229,9 @@
       const change = (record) => {
         formvisible.value = true
         formState.cobyUser = record
+        formState.user.goods_name = record.goods_name
+        formState.user.sort_num = record.sort_num
+        formState.user.goods_id = record.goods_id
         console.log(record)
         isWrite.value = true
       }
