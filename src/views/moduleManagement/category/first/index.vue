@@ -114,7 +114,7 @@
       // 请求数据
       const getData = (obj) => {
         find(obj).then((value) => {
-          console.log(obj, '请求传入的数据')
+          // console.log(obj, '请求传入的数据')
           data.arr = value.data.Categories
           pagination.total = value.data.Number
         })
@@ -286,7 +286,7 @@
           Size: 5,
           PreCategory: 0,
         }
-        console.log(obj)
+        // console.log(obj)
         find(obj, 5).then((value) => {
           data.arr = value.data.Categories
         })
@@ -295,7 +295,7 @@
       // 路由跳转
       var router = useRouter()
       const next = (record) => {
-        console.log(record.ClassName)
+        // console.log(record.ClassName)
         router.push({
           name: 'secondCategory',
           query: {

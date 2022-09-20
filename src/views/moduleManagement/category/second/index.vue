@@ -127,9 +127,9 @@
         deleteData(arr).then(() => {
           const firstObj1 = {
             Page: pages,
-            PreName: '无',
+            PreName: route.query.name,
             Size: 5,
-            PreCategory: 0,
+            PreCategory: 1,
           }
           getData(firstObj1)
         })
@@ -199,9 +199,9 @@
           addData(obj).then(() => {
             const firstObj1 = {
               Page: pages,
-              PreName: '无',
+              PreName: route.query.name,
               Size: 5,
-              PreCategory: 0,
+              PreCategory: 1,
             }
             getData(firstObj1)
           })
@@ -216,9 +216,9 @@
           update(obj).then(() => {
             const firstObj1 = {
               Page: pages,
-              PreName: '无',
+              PreName: route.query.name,
               Size: 5,
-              PreCategory: 0,
+              PreCategory: 1,
             }
             getData(firstObj1)
           })

@@ -134,7 +134,7 @@
 
       if (store.getters['goods/getData'] != false) {
         formState.user = store.getters['goods/getData']
-        console.log(formState.user, 'formState.user')
+        // console.log(formState.user, 'formState.user')
       }
       let checkAge = async (_rule, value) => {
         if (!value) {
