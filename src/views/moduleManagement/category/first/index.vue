@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <a-button @click="showInput" type="primary">增加商品</a-button>
+      <a-button @click="showInput" type="primary">增加分类</a-button>
       <a-button
         danger
         type="primary"
@@ -13,13 +13,19 @@
         批量删除
       </a-button>
       <!-- 表单 -->
-      <a-modal v-model:visible="formvisible" title="添加分类" class="add">
+      <a-modal
+        :footer="null"
+        v-model:visible="formvisible"
+        title="添加分类"
+        @cancel="cancel"
+      >
         <a-form
           :model="formState"
           v-bind="layout"
           name="nest-messages"
           :validate-messages="validateMessages"
           @finish="onFinish"
+          ref="editUserFormRef"
         >
           <a-form-item
             label="分类名称"
@@ -37,7 +43,7 @@
             <a-input v-model:value="formState.user.sort_num" />
           </a-form-item>
 
-          <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
+          <a-form-item :wrapper-col="{ ...layout.wrapperCol, offset: 8 }">
             <a-button type="primary" html-type="submit">提交</a-button>
           </a-form-item>
         </a-form>
@@ -81,7 +87,7 @@
         {
           title: '分类名称',
           dataIndex: 'ClassName',
-          width: '49% ',
+          width: '40% ',
         },
         {
           title: '排序值',
@@ -96,16 +102,19 @@
         {
           title: '操作',
           dataIndex: 'done',
-          width: '21% ',
+          width: '30% ',
         },
       ]
       const data = reactive({
         arr: [],
       })
+      // 页码
+      let pages = reactive(1)
       // 请求函数
       // 请求数据
       const getData = (obj) => {
         find(obj).then((value) => {
+          // console.log(obj, '请求传入的数据')
           data.arr = value.data.Categories
           pagination.total = value.data.Number
         })
@@ -113,7 +122,13 @@
       // 删除请求封装
       const deleteOther = (arr) => {
         deleteData(arr).then(() => {
-          getData(firstObj)
+          const firstObj1 = {
+            Page: pages,
+            PreName: '无',
+            Size: 5,
+            PreCategory: 0,
+          }
+          getData(firstObj1)
         })
       }
 
@@ -138,6 +153,7 @@
           sort_num: '',
         },
       }
+
       // 旧数据
       const oldData = {
         user: {
@@ -187,35 +203,51 @@
           range: '${label} must be between ${min} and ${max}',
         },
       }
+      const editUserFormRef = ref()
+      const cancel = () => {
+        editUserFormRef.value.resetFields()
+      }
 
       // 完成提交
       const onFinish = (values) => {
-        console.log(addOrChange.value)
-        console.log('111111111111')
+        // console.log(addOrChange.value)
+        // console.log('111111111111')
         formvisible.value = false //收起来弹出框
         if (addOrChange.value) {
-          console.log('新增')
+          // console.log('新增')
           const obj = {
             class_name: values.user.class_name,
             pre_name: '无',
             cur_category: 1,
             sort_num: Number(values.user.sort_num),
           }
-          addData(obj).then((value) => {
-            console.log('成功了', value)
-            getData(firstObj)
+          addData(obj).then(() => {
+            // console.log('成功了', value)
+            const firstObj1 = {
+              Page: pages,
+              PreName: '无',
+              Size: 5,
+              PreCategory: 0,
+            }
+            getData(firstObj1)
           })
         } else {
-          console.log('修改')
+          // console.log('修改')
           const obj = {
             name: values.user.class_name,
             pre_name: oldData.user.class_name,
             cur_category: 1,
             sort_num: Number(values.user.sort_num),
           }
-          update(obj).then((value) => {
-            console.log('成功了', value)
-            getData(firstObj)
+          update(obj).then(() => {
+            // console.log('成功了', value)
+            const firstObj1 = {
+              Page: pages,
+              PreName: '无',
+              Size: 5,
+              PreCategory: 0,
+            }
+            getData(firstObj1)
           })
         }
       }
@@ -241,17 +273,20 @@
       const pagination = reactive({
         showLessItems: true,
         showQuickJumper: true,
-        showSizeChanger: true,
+        showSizeChanger: false,
         defaultPageSize: 5,
         total: 20,
       })
+
       const changePag = (e) => {
+        pages = e.current
         const obj = {
           Page: e.current,
           PreName: '无',
           Size: 5,
           PreCategory: 0,
         }
+        // console.log(obj)
         find(obj, 5).then((value) => {
           data.arr = value.data.Categories
         })
@@ -260,6 +295,7 @@
       // 路由跳转
       var router = useRouter()
       const next = (record) => {
+        // console.log(record.ClassName)
         router.push({
           name: 'secondCategory',
           query: {
@@ -283,6 +319,8 @@
         formState,
         onFinish,
         showInput,
+        editUserFormRef,
+        cancel,
         //  分页
         pagination,
         rowSelection,
@@ -299,6 +337,6 @@
 
 <style>
   .add {
-    margin-left: 10px;
+    margin-left: 5px;
   }
 </style>

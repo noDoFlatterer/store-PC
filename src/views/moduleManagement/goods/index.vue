@@ -154,7 +154,7 @@
       const pagination = reactive({
         showLessItems: true,
         showQuickJumper: true,
-        showSizeChanger: true,
+        showSizeChanger: false,
         defaultPageSize: 5,
         total: 0,
       })
