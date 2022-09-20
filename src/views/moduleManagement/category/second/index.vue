@@ -5,7 +5,7 @@
         返回上一级
       </a-button>
       <a-button @click="showInput()" type="primary" class="add">
-        增加商品
+        增加分类
       </a-button>
       <a-button
         danger
@@ -18,13 +18,19 @@
         批量删除
       </a-button>
       <!-- 表单 -->
-      <a-modal v-model:visible="formvisible" title="添加分类" class="add">
+      <a-modal
+        :footer="null"
+        v-model:visible="formvisible"
+        title="添加分类"
+        @cancel="flushForm"
+      >
         <a-form
           :model="formState"
           v-bind="layout"
           name="nest-messages"
           :validate-messages="validateMessages"
           @finish="onFinish"
+          ref="editUserFormRef"
         >
           <a-form-item
             label="分类名称"
@@ -63,9 +69,7 @@
             <a-radio-button @click="change(record)" value="small">
               修改
             </a-radio-button>
-            <a-radio-button @click="next(record)" value="small">
-              下级分类
-            </a-radio-button>
+            <a-button @click="next(record)" value="small">下级分类</a-button>
             <a-radio-button @click="deleteOne(record)" value="small">
               删除
             </a-radio-button>
@@ -75,6 +79,7 @@
     </a-table>
   </div>
 </template>
+
 <script>
   import { addData, find, deleteData, update } from '@/api/category'
   import { computed, defineComponent, ref, reactive, toRefs } from 'vue'
@@ -86,7 +91,7 @@
         {
           title: '分类名称',
           dataIndex: 'ClassName',
-          width: '49% ',
+          width: '40% ',
         },
         {
           title: '排序值',
@@ -101,12 +106,14 @@
         {
           title: '操作',
           dataIndex: 'done',
-          width: '21% ',
+          width: '30% ',
         },
       ]
       const data = reactive({
         arr: [],
       })
+      // 页码
+      let pages = reactive(1)
       // 请求函数
       // 请求数据
       const getData = (obj) => {
@@ -118,7 +125,13 @@
       // 删除请求封装
       const deleteOther = (arr) => {
         deleteData(arr).then(() => {
-          getData(firstObj)
+          const firstObj1 = {
+            Page: pages,
+            PreName: '无',
+            Size: 5,
+            PreCategory: 0,
+          }
+          getData(firstObj1)
         })
       }
       // 路由传来的数据
@@ -176,24 +189,38 @@
       const onFinish = (values) => {
         formvisible.value = false //收起来弹出框
         if (addOrChange.value) {
+          // 添加
           const obj = {
             class_name: values.user.class_name,
             pre_name: route.query.name,
-            cur_category: 3,
+            cur_category: 2,
             sort_num: Number(values.user.sort_num),
           }
           addData(obj).then(() => {
-            getData(firstObj)
+            const firstObj1 = {
+              Page: pages,
+              PreName: '无',
+              Size: 5,
+              PreCategory: 0,
+            }
+            getData(firstObj1)
           })
         } else {
+          // 修改
           const obj = {
             name: values.user.class_name,
             pre_name: oldData.user.class_name,
-            cur_category: 3,
+            cur_category: 2,
             sort_num: Number(values.user.sort_num),
           }
           update(obj).then(() => {
-            getData(firstObj)
+            const firstObj1 = {
+              Page: pages,
+              PreName: '无',
+              Size: 5,
+              PreCategory: 0,
+            }
+            getData(firstObj1)
           })
         }
       }
@@ -225,11 +252,12 @@
         total: 20,
       })
       const changePag = (e) => {
+        pages = e.current
         const obj = {
           Page: e.current,
-          PreName: '无',
+          PreName: route.query.name,
           Size: 5,
-          PreCategory: 0,
+          PreCategory: 1,
         }
         find(obj, 5).then((value) => {
           data.arr = value.data.Categories
@@ -272,6 +300,10 @@
           range: '${label} must be between ${min} and ${max}',
         },
       }
+      const editUserFormRef = ref()
+      const flushForm = () => {
+        editUserFormRef.value.resetFields()
+      }
 
       return {
         data,
@@ -288,6 +320,8 @@
         formState,
         onFinish,
         showInput,
+        editUserFormRef,
+        flushForm,
         //  分页
         pagination,
         rowSelection,

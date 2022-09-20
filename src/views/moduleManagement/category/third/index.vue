@@ -5,7 +5,7 @@
         返回上一级
       </a-button>
       <a-button @click="showInput()" type="primary" class="add">
-        增加商品
+        增加分类
       </a-button>
       <a-button
         danger
@@ -18,13 +18,19 @@
         批量删除
       </a-button>
       <!-- 表单 -->
-      <a-modal v-model:visible="formvisible" title="添加分类" class="add">
+      <a-modal
+        :footer="null"
+        v-model:visible="formvisible"
+        title="添加分类"
+        @cancel="flushForm"
+      >
         <a-form
           :model="formState"
           v-bind="layout"
           name="nest-messages"
           :validate-messages="validateMessages"
           @finish="onFinish"
+          ref="editUserFormRef"
         >
           <a-form-item
             label="分类名称"
@@ -92,7 +98,13 @@
       // 删除请求封装
       const deleteOther = (arr) => {
         deleteData(arr).then(() => {
-          getData(firstObj)
+          const firstObj1 = {
+            Page: pages,
+            PreName: '无',
+            Size: 5,
+            PreCategory: 0,
+          }
+          getData(firstObj1)
         })
       }
       // 路由传来的数据
@@ -110,7 +122,7 @@
         {
           title: '分类名称',
           dataIndex: 'ClassName',
-          width: '49% ',
+          width: '40% ',
         },
         {
           title: '排序值',
@@ -125,12 +137,14 @@
         {
           title: '操作',
           dataIndex: 'done',
-          width: '21% ',
+          width: '30% ',
         },
       ]
       const data = reactive({
         arr: [],
       })
+      // 页码
+      let pages = reactive(1)
 
       const visible = ref(false)
       const formvisible = ref(false)
@@ -185,7 +199,13 @@
             sort_num: Number(values.user.sort_num),
           }
           addData(obj).then(() => {
-            getData(firstObj)
+            const firstObj1 = {
+              Page: pages,
+              PreName: '无',
+              Size: 5,
+              PreCategory: 0,
+            }
+            getData(firstObj1)
           })
         } else {
           const obj = {
@@ -195,7 +215,13 @@
             sort_num: Number(values.user.sort_num),
           }
           update(obj).then(() => {
-            getData(firstObj)
+            const firstObj1 = {
+              Page: pages,
+              PreName: '无',
+              Size: 5,
+              PreCategory: 0,
+            }
+            getData(firstObj1)
           })
         }
       }
@@ -227,11 +253,12 @@
         total: 20,
       })
       const changePag = (e) => {
+        pages = e.current
         const obj = {
           Page: e.current,
-          PreName: '无',
+          PreName: route.query.name,
           Size: 5,
-          PreCategory: 0,
+          PreCategory: 2,
         }
         find(obj, 5).then((value) => {
           if ((data.arr = value.data.Categories)) {
@@ -268,6 +295,10 @@
           range: '${label} must be between ${min} and ${max}',
         },
       }
+      const editUserFormRef = ref()
+      const flushForm = () => {
+        editUserFormRef.value.resetFields()
+      }
 
       return {
         data,
@@ -284,6 +315,8 @@
         formState,
         onFinish,
         showInput,
+        editUserFormRef,
+        flushForm,
         //  分页
         pagination,
         rowSelection,

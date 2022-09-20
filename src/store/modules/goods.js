@@ -6,7 +6,7 @@ const getters = {
 }
 const mutations = {
   changeUser(state, value) {
-    // console.log(value,'vue x的数据');
+    console.log(value, 'vue x的数据')
     state.user = value
     console.log(state.user, '接收到数据')
   },

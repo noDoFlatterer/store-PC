@@ -75,12 +75,10 @@
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'img'">
-          <img :src="record.image" alt="" srcset="" />
+          <img :src="record.image" alt srcset />
         </template>
         <template v-else-if="column.key === 'addtime'">
-          <a>
-            {{ record.addtime }}
-          </a>
+          <a>{{ record.addtime }}</a>
         </template>
         <template v-else-if="column.key === 'action'">
           <a-button type="primary" @click="change(record)">修改</a-button>
