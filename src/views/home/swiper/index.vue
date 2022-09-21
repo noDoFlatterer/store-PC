@@ -25,9 +25,15 @@
           @finish="onFinish"
         >
           <a-form-item
-            :name="['fileList']"
+            :name="['user', 'image']"
             label="图片"
-            :rules="[{ required: true, message: '图片不能为空!' }]"
+            :rules="[
+              {
+                required: true,
+                message: '图片不能为空!',
+                trigger: ['blur', 'change'],
+              },
+            ]"
           >
             <a-upload
               v-model:file-list="fileList"
@@ -51,7 +57,7 @@
             :name="['user', 'sort_num']"
             label="排序值"
             :rules="[
-              { required: true, message: '排序值不能为空!', trigger: 'change' },
+              { required: true, trigger: 'change', validator: checksort },
             ]"
           >
             <a-input-number v-model:value="formState.user.sort_num" />
@@ -82,11 +88,16 @@
             {{ record.addtime }}
           </a>
         </template>
-        <template v-else-if="column.key === 'action'">
+        <template v-else-if="column.key === 'action'" class="aaa">
           <a-button type="primary" @click="change(record)">修改</a-button>
-          <a-button type="primary" danger class="del" @click="delOne(record)">
-            删除
-          </a-button>
+          <a-popconfirm
+            title="确定是否删除?"
+            ok-text="是"
+            cancel-text="否"
+            @confirm="delOne(record)"
+          >
+            <a-button type="primary" danger class="del">删除</a-button>
+          </a-popconfirm>
         </template>
       </template>
     </a-table>
@@ -115,19 +126,47 @@
       title: '轮播图',
       dataIndex: 'img',
       key: 'img',
+      customCell: () => {
+        return {
+          style: {
+            'min-width': '100px',
+          },
+        }
+      },
     },
     {
       title: '排序值',
       dataIndex: 'sort_num',
+      customCell: () => {
+        return {
+          style: {
+            'min-width': '100px',
+          },
+        }
+      },
     },
     {
       title: '添加时间',
       dataIndex: 'created_at',
+      customCell: () => {
+        return {
+          style: {
+            'min-width': '100px',
+          },
+        }
+      },
     },
     {
       title: '操作',
       dataIndex: 'action',
       key: 'action',
+      customCell: () => {
+        return {
+          style: {
+            'min-width': '100px',
+          },
+        }
+      },
     },
   ]
   let tableData = reactive({
@@ -139,14 +178,6 @@
       PlusOutlined,
     },
     setup() {
-      const visible = ref(false)
-      const formvisible = ref(false)
-      const addorchange = ref(true)
-      const state = reactive({
-        selectedRowKeys: [],
-        // Check here to configure the default column
-        loading: false,
-      })
       // 表单信息
       const formState = reactive({
         user: {
@@ -156,13 +187,7 @@
         },
         fileList: {},
       })
-      // 添加图片
-      const fileList = ref([])
-      const loading = ref(false)
-      const imageUrl = ref('')
-      const showModal = () => {
-        visible.value = true
-      }
+
       // 分页
       const pagination = reactive({
         showLessItems: true,
@@ -183,6 +208,7 @@
           updateOther(page.pageSize, page.current)
         }
       }
+
       // 用来批量删除
       const handleOk = () => {
         visible.value = false
@@ -221,6 +247,11 @@
           }
         })
       }
+      // 判断是添加还是修改
+      const addorchange = ref(true)
+      // 是否打开
+      const visible = ref(false)
+      const formvisible = ref(false)
       // 添加
       const add = () => {
         formvisible.value = true
@@ -229,7 +260,12 @@
         formState.user = {}
         imageUrl.value = ''
       }
-      // 判断选中
+      // 判断选中内容
+      const state = reactive({
+        selectedRowKeys: [],
+        // Check here to configure the default column
+        loading: false,
+      })
       const hasSelected = computed(() => state.selectedRowKeys.length > 0)
       const onSelectChange = (selectedRowKeys) => {
         state.selectedRowKeys = selectedRowKeys
@@ -265,11 +301,11 @@
           // 添加
           formvisible.value = false
           state.loading = true // ajax request after empty completing
-          // 这里需要进行深拷贝
           const test = {
             image: formState.user.image,
             sort_number: formState.user.sort_num,
           }
+          console.log(test)
           addSwiper(test).then((res) => {
             message.info(res.data)
             if (nowPage.value == 1) {
@@ -292,8 +328,25 @@
           state.selectedRowKeys = []
         }, 1000)
       }
-
+      // 校验
+      let checksort = async (_rule, value) => {
+        if (value > 100) {
+          return Promise.reject('输入的值不能大于100')
+        } else if (value == null) {
+          return Promise.reject('输入的值不能为空')
+        } else if (value < 0) {
+          return Promise.reject('输入的值不能小于零')
+        } else {
+          return Promise.resolve()
+        }
+      }
       // 添加图片
+      const fileList = ref([])
+      const loading = ref(false)
+      const imageUrl = ref('')
+      const showModal = () => {
+        visible.value = true
+      }
       const handleChange = (info) => {
         info.file.status = 'done'
         if (info.file.status === 'uploading') {
@@ -301,6 +354,7 @@
           return
         }
         if (info.file.status === 'done') {
+          formState.user.image = 1
           // Get this url from response in real world.
           getBase64(info.file.originFileObj, (base64Url) => {
             imageUrl.value = base64Url
@@ -316,13 +370,13 @@
         const isJpgOrPng =
           file.type === 'image/jpeg' || file.type === 'image/png'
         if (!isJpgOrPng) {
-          message.error('You can only upload JPG file!')
+          message.error('只能添加JPG或PNG类型图片!')
         }
 
         const isLt2M = file.size / 1024 / 1024 < 2
 
         if (!isLt2M) {
-          message.error('Image must smaller than 2MB!')
+          message.error('图片大小不能超过2MB!')
         }
 
         return isJpgOrPng && isLt2M
@@ -382,11 +436,12 @@
         changePage,
         nowPage,
         updateOther,
+        checksort,
       }
     },
   })
 </script>
-<style>
+<style scoped>
   img {
     height: 100px;
     width: 100px;
@@ -394,7 +449,7 @@
   .del {
     margin-left: 10px;
   }
-  .add {
+  .ant-btn {
     margin-left: 10px;
   }
 </style>
