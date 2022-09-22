@@ -44,7 +44,6 @@
             :rules="[{ required: true }]"
           >
             <a-input-number
-              disabled
               class="goodsid"
               v-model:value="formState.user.goods_id"
             />

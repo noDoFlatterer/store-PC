@@ -7,16 +7,22 @@
       <a-button @click="showInput()" type="primary" class="add">
         增加分类
       </a-button>
-      <a-button
-        danger
-        type="primary"
-        :disabled="!hasSelected"
-        :loading="loading"
-        @click="deleteAll"
-        class="add"
+      <a-popconfirm
+        title="你确定要删除这些分类吗?删除了可就找不回来了哦"
+        ok-text="狠心删除"
+        cancel-text="我再想想"
+        @confirm="deleteAll()"
       >
-        批量删除
-      </a-button>
+        <a-button
+          danger
+          type="primary"
+          :disabled="!hasSelected"
+          :loading="loading"
+          class="add"
+        >
+          批量删除
+        </a-button>
+      </a-popconfirm>
       <!-- 表单 -->
       <a-modal
         :footer="null"
@@ -65,14 +71,21 @@
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'done'">
-          <a-radio-group>
-            <a-radio-button @click="change(record)" value="small">
-              修改
-            </a-radio-button>
-            <a-radio-button @click="deleteOne(record)" value="small">
-              删除
-            </a-radio-button>
-          </a-radio-group>
+          <div style="while-space: nowrap">
+            <a-radio-group>
+              <a-radio-button @click="change(record)" value="small">
+                修改
+              </a-radio-button>
+              <a-popconfirm
+                title="你确定要删除吗?删除了可就找不回来了哦"
+                ok-text="狠心删除"
+                cancel-text="我再想想"
+                @confirm="deleteOne(record)"
+              >
+                <a-button danger :size="size">删除</a-button>
+              </a-popconfirm>
+            </a-radio-group>
+          </div>
         </template>
       </template>
     </a-table>
@@ -122,22 +135,58 @@
         {
           title: '分类名称',
           dataIndex: 'ClassName',
-          width: '40% ',
+          width: '25% ',
+          customCell: () => {
+            return {
+              style: {
+                'min-width': '150px',
+                'max-width': '200px',
+              },
+            }
+          },
+          ellipsis: true,
         },
         {
           title: '排序值',
           dataIndex: 'SortNum',
           width: '15% ',
+          customCell: () => {
+            return {
+              style: {
+                'min-width': '150px',
+                'max-width': '200px',
+              },
+            }
+          },
+          ellipsis: true,
         },
         {
           title: '添加时间',
           dataIndex: 'CreatedAt',
-          width: '15% ',
+          width: '20% ',
+          customCell: () => {
+            return {
+              style: {
+                'min-width': '150px',
+                'max-width': '200px',
+              },
+            }
+          },
+          ellipsis: true,
         },
         {
           title: '操作',
           dataIndex: 'done',
-          width: '30% ',
+          width: '40% ',
+          customCell: () => {
+            return {
+              style: {
+                'min-width': '150px',
+                'max-width': '200px',
+              },
+            }
+          },
+          ellipsis: true,
         },
       ]
       const data = reactive({
