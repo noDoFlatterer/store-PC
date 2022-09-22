@@ -8,28 +8,34 @@
       title: '昵称',
       dataIndex: 'id',
       key: 'id',
+      ellipsis: true,
     },
     {
       title: '登录名',
       dataIndex: 'username',
       key: 'username',
+      ellipsis: true,
     },
     {
       title: '身份状态',
       dataIndex: 'idstatus',
       key: 'idstatus',
+      ellipsis: true,
     },
     {
       title: '是否注销',
       dataIndex: 'iscancel',
       key: 'iscancel',
+      ellipsis: true,
     },
     {
       title: '注册时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
+      ellipsis: true,
     },
   ]
+  let visible = ref(false)
   let page = 1
   // 分页配置项
   const pagination = reactive({
@@ -99,6 +105,11 @@
         updatePage()
       }
     })
+    visible.value = false
+  }
+
+  function click_ok() {
+    visible.value = true
   }
 </script>
 
@@ -108,10 +119,13 @@
       <PlusOutlined />
       解除禁用
     </a-button>
-    <a-button type="primary" style="margin-left: 10px" @click="DisableAccount">
+    <a-button type="primary" style="margin-left: 10px" @click="click_ok">
       <DeleteOutlined />
       禁用账户
     </a-button>
+    <a-modal title="Title" v-model:visible="visible" @ok="DisableAccount">
+      <p>你确定要都关闭吗</p>
+    </a-modal>
     <a-table
       :row-selection="{
         selectedRowKeys: selectedRowKeys,
