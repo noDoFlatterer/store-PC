@@ -3,7 +3,7 @@
     <a-space direction="horizontal">
       <a-input-search
         v-model:value="input_value"
-        placeholder="input search text"
+        placeholder="输入完整id"
         style="width: 200px"
         @search="onSearch"
       />
@@ -29,10 +29,13 @@
         <BankOutlined />
         出库
       </a-button>
-      <a-button type="primary" danger @click="Disable">
+      <a-button type="primary" danger @click="click_ok">
         <DeleteOutlined />
         关闭订单
       </a-button>
+      <a-modal title="Title" v-model:visible="visible" @ok="handleOk">
+        <p>你确定要都关闭吗</p>
+      </a-modal>
     </a-space>
 
     <a-table
@@ -55,33 +58,61 @@
           <span v-if="record.status === -2">商家关闭</span>
         </template>
         <template v-if="column.title === '操作'">
-          <span style="color: blue">
+          <span style="color: blue; cursor: pointer; white-space: nowrap">
             <span v-if="record.status === 0">
-              <span @click="closeOrder(record)">&nbsp;关闭订单&nbsp;</span>
-              <span @click="openDetail(record)">&nbsp;订单详情&nbsp;</span>
+              <a-popconfirm
+                title="你确定关闭此订单吗?"
+                ok-text="Yes"
+                cancel-text="No"
+                @confirm="closeOrder(record)"
+              >
+                <a href="#" style="color: red">&nbsp;关闭订单&nbsp;</a>
+              </a-popconfirm>
+              <span @click="openDetail(record)">&nbsp;详情&nbsp;</span>
             </span>
             <span v-if="record.status === 1">
               <span @click="simPareGoods(record)">&nbsp;配货完成&nbsp;</span>
-              <span @click="closeOrder(record)">&nbsp;关闭订单&nbsp;</span>
-              <span @click="openDetail(record)">&nbsp;订单详情&nbsp;</span>
+              <a-popconfirm
+                title="你确定关闭此订单吗?"
+                ok-text="Yes"
+                cancel-text="No"
+                @confirm="closeOrder(record)"
+              >
+                <a href="#" style="color: red">&nbsp;关闭订单&nbsp;</a>
+              </a-popconfirm>
+              <span @click="openDetail(record)">&nbsp;详情&nbsp;</span>
             </span>
             <span v-if="record.status === 2">
               <span @click="simOutStore(record)">&nbsp;出库&nbsp;</span>
-              <span @click="closeOrder(record)">&nbsp;关闭订单&nbsp;</span>
-              <span @click="openDetail(record)">&nbsp;订单详情&nbsp;</span>
+              <a-popconfirm
+                title="你确定关闭此订单吗?"
+                ok-text="Yes"
+                cancel-text="No"
+                @confirm="closeOrder(record)"
+              >
+                <a href="#" style="color: red">&nbsp;关闭订单&nbsp;</a>
+              </a-popconfirm>
+              <span @click="openDetail(record)">&nbsp;详情&nbsp;</span>
             </span>
             <span v-if="record.status === 3">
-              <span @click="closeOrder(record)">&nbsp;关闭订单&nbsp;</span>
-              <span @click="openDetail(record)">&nbsp;订单详情&nbsp;</span>
+              <a-popconfirm
+                title="你确定关闭此订单吗?"
+                ok-text="Yes"
+                cancel-text="No"
+                @confirm="closeOrder(record)"
+              >
+                <a href="#">&nbsp;关闭订单&nbsp;</a>
+              </a-popconfirm>
+              <span @click="openDetail(record)">&nbsp;详情&nbsp;</span>
             </span>
             <span v-if="record.status === 4" @click="openDetail(record)">
-              &nbsp;订单详情&nbsp;
+              &nbsp;详情&nbsp;
             </span>
             <span v-if="record.status === -1" @click="openDetail(record)">
-              &nbsp;订单详情&nbsp;
+              &nbsp;详情&nbsp;
             </span>
             <span v-if="record.status === -2" @click="openDetail(record)">
-              &nbsp;订单详情&nbsp;
+              &nbsp;详情&nbsp;
             </span>
           </span>
         </template>
@@ -107,22 +138,27 @@
     {
       title: '订单号',
       dataIndex: 'order_id',
+      ellipsis: true,
     },
     {
       title: '订单总价',
       dataIndex: 'total_money',
+      ellipsis: true,
     },
     {
       title: '订单状态',
       dataIndex: 'status',
+      ellipsis: true,
     },
     {
       title: '支付方式',
       dataIndex: 'pay_method',
+      ellipsis: true,
     },
     {
       title: '创建时间',
       dataIndex: 'created_at',
+      ellipsis: true,
     },
     {
       title: '操作',
@@ -157,7 +193,7 @@
           getOrders({ page }).then((res) => {
             pagination.total = res.data.size
             res.data.order_data.map((item) => {
-              item.pay_method = item.pay_method == 1 ? '已支付' : '未支付'
+              item.pay_method = item.pay_method == 1 ? '微信' : '支付宝'
               item.created_at = changeDate(item.created_at)
             })
             orderData.value = res.data.order_data
@@ -379,7 +415,18 @@
           },
         })
       }
+      let visible = ref(false)
+      function click_ok() {
+        visible.value = true
+      }
+      function handleOk() {
+        Disable()
+        visible.value = false
+      }
       return {
+        handleOk,
+        click_ok,
+        visible,
         openDetail,
         columns,
         rowSelection,
