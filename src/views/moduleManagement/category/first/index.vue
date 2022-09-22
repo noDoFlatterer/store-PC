@@ -167,7 +167,6 @@
         find(obj).then((value) => {
           data.arr = value.data.Categories
           pagination.total = value.data.Number
-          console.log(value, '返回的数据')
         })
       }
       // 删除请求封装
@@ -261,8 +260,6 @@
 
       // 完成提交
       const onFinish = (values) => {
-        // console.log(addOrChange.value)
-        // console.log('111111111111')
         formvisible.value = false //收起来弹出框
         if (addOrChange.value) {
           // console.log('新增')
@@ -337,7 +334,6 @@
           Size: 5,
           PreCategory: 0,
         }
-        // console.log(obj)
         find(obj, 5).then((value) => {
           data.arr = value.data.Categories
         })
@@ -346,7 +342,6 @@
       // 路由跳转
       var router = useRouter()
       const next = (record) => {
-        // console.log(record.ClassName)
         router.push({
           name: 'secondCategory',
           query: {

@@ -160,7 +160,6 @@
       })
 
       formState.user = store.getters['goods/getData']
-      console.log(formState.user, '传到add组件里面的数据')
 
       let checkAge = async (_rule, value) => {
         if (!value) {
@@ -231,24 +230,18 @@
       }
 
       const handleFinish = () => {
-        console.log(route.query.state)
         if (Array.isArray(formState.user.category)) {
           const arr = formState.user.category
           formState.user.category = arr[arr.length - 1]
         }
         if (route.query.state == 1) {
-          console.log(route.query.state, '222222222222')
-          // console.log(formState.user, '传入请求的数据    category')
-          console.log(formState.user, '传入请求的数据')
-          addGoods(formState.user).then((value) => {
-            console.log(value, '提交成功')
+          addGoods(formState.user).then(() => {
+            // console.log(value, '提交成功')
             message.info('添加成功')
           })
         } else {
-          // console.log(formState.user, '传入请求的数据  category')
-          console.log(formState.user, '传入请求的数据')
-          updateGoods(formState.user).then((value) => {
-            console.log(value, '修改成功')
+          updateGoods(formState.user).then(() => {
+            // console.log(value, '修改成功')
             message.info('修改成功')
           })
         }
@@ -264,7 +257,6 @@
       const fileList = ref([])
       const loading = ref(false)
       const imageUrl = ref('')
-      // console.log(formState.user.image, 'formState.user.image')
       if (formState.user.image) {
         imageUrl.value = formState.user.image
       }
@@ -278,7 +270,6 @@
         if (info.file.status === 'done') {
           getBase64(info.file.originFileObj, (base64Url) => {
             imageUrl.value = base64Url
-            // console.log(imageUrl.value, '.value.value')
             loading.value = false
           })
         }
@@ -307,7 +298,6 @@
       }
       // 自定义文件上传
       const customRequest = (data) => {
-        // console.log(data)
         const formData = new FormData()
         formData.append('f1', data.file)
         uploadImg(formData).then((res) => {
