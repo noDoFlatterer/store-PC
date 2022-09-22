@@ -33,7 +33,7 @@
           <a-form-item
             :name="['user', 'goods_name']"
             label="商品名称"
-            :rules="[{ required: true }]"
+            :rules="[{ required: true, validator: checkname }]"
           >
             <a-input v-model:value="formState.user.goods_name" />
           </a-form-item>
@@ -52,7 +52,7 @@
           <a-form-item
             :name="['user', 'sort_num']"
             label="排序值"
-            :rules="[{ required: true }]"
+            :rules="[{ required: true, validator: checksort }]"
           >
             <a-input-number v-model:value="formState.user.sort_num" />
           </a-form-item>
@@ -69,13 +69,20 @@
       :pagination="pagination"
       :row-key="(record) => record.goods_id"
       @change="changePage"
+      style="word-break: break-all"
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <a-button type="primary" @click="change(record)">修改</a-button>
-          <a-button type="primary" danger class="del" @click="delone(record)">
-            删除
-          </a-button>
+
+          <a-popconfirm
+            title="确定是否删除?"
+            ok-text="是"
+            cancel-text="否"
+            @confirm="delOne(record)"
+          >
+            <a-button type="primary" danger class="del">删除</a-button>
+          </a-popconfirm>
         </template>
       </template>
     </a-table>
@@ -91,23 +98,58 @@
     {
       title: '商品名称',
       dataIndex: 'goods_name',
+      customCell: () => {
+        return {
+          style: {
+            'min-width': '100px',
+          },
+        }
+      },
     },
     {
       title: '排序值',
       dataIndex: 'sort_num',
+      customCell: () => {
+        return {
+          style: {
+            'min-width': '100px',
+          },
+        }
+      },
     },
     {
       title: '商品编号',
       dataIndex: 'goods_id',
+      customCell: () => {
+        return {
+          style: {
+            'min-width': '100px',
+          },
+        }
+      },
     },
     {
       title: '添加时间',
       dataIndex: 'created_at',
+      customCell: () => {
+        return {
+          style: {
+            'min-width': '100px',
+          },
+        }
+      },
     },
     {
       title: '操作',
       dataIndex: 'action',
       key: 'action',
+      customCell: () => {
+        return {
+          style: {
+            'min-width': '100px',
+          },
+        }
+      },
     },
   ]
 
@@ -128,14 +170,14 @@
       })
 
       // 表单信息
-      const formState = {
+      const formState = reactive({
         user: {
           goods_name: '',
           goods_id: '',
           sort_num: '',
           Kind: 0,
         },
-      }
+      })
       // 分页
       const pagination = reactive({
         showLessItems: true,
@@ -228,6 +270,25 @@
           span: 16,
         },
       }
+      let checksort = async (_rule, value) => {
+        if (value > 100) {
+          return Promise.reject('输入的值不能大于100')
+        } else if (value == null) {
+          return Promise.reject('输入的值不能为空')
+        } else if (value < 0) {
+          return Promise.reject('输入的值不能小于零')
+        } else {
+          return Promise.resolve()
+        }
+      }
+
+      let checkname = async (_rule, value) => {
+        if (value.length > 10) {
+          return Promise.reject('输入商品名称长度不能大于10')
+        } else {
+          return Promise.resolve()
+        }
+      }
       const validateMessages = {
         required: '${label} is required!',
         types: {
@@ -309,6 +370,8 @@
         formRef,
         cancel,
         delone,
+        checksort,
+        checkname,
       }
     },
   })
@@ -321,7 +384,7 @@
   .del {
     margin-left: 10px;
   }
-  .add {
+  .ant-btn {
     margin-left: 10px;
   }
   .goodsid {
