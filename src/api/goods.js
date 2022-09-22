@@ -27,11 +27,20 @@ export function alterStatus(data) {
   })
 }
 
-// 添加商品，修改商品
+// 添加商品
 export function addGoods(data) {
   return request({
     url: `/api/api/v1/goods/addGoods`,
     method: 'post',
+    data,
+  })
+}
+
+// 修改商品
+export function updateGoods(data) {
+  return request({
+    url: `/api/api/v1/goods/updateGoods`,
+    method: 'put',
     data,
   })
 }
