@@ -132,7 +132,7 @@
     getKindOrder,
     getOrderById,
   } from '@/api/order'
-  import { changeDate } from '@/utils/date'
+  // import { changeDate } from '@/utils/date'
   import { useRouter } from 'vue-router'
   const columns = [
     {
@@ -193,10 +193,11 @@
           getOrders({ page }).then((res) => {
             pagination.total = res.data.size
             res.data.order_data.map((item) => {
-              if(item.pay_method==0){
-                item.pay_method = "未支付"
-              }else{
-                item.pay_method = item.pay_method == 1 ? '微信支付' :"支付宝支付"
+              if (item.pay_method == 0) {
+                item.pay_method = '未支付'
+              } else {
+                item.pay_method =
+                  item.pay_method == 1 ? '微信支付' : '支付宝支付'
               }
               // item.created_at = changeDate(item.created_at)
             })
@@ -370,10 +371,11 @@
           if (res.code === 1000) {
             pagination.total = 1
             res.data.order_data.map((item) => {
-              if(item.pay_method==0){
-                item.pay_method = "未支付"
-              }else{
-                item.pay_method = item.pay_method == 1 ? '微信支付' :"支付宝支付"
+              if (item.pay_method == 0) {
+                item.pay_method = '未支付'
+              } else {
+                item.pay_method =
+                  item.pay_method == 1 ? '微信支付' : '支付宝支付'
               }
               // item.created_at = changeDate(item.created_at)
             })
@@ -401,11 +403,12 @@
             if (res.code === 1000) {
               pagination.total = res.data.size
               res.data.order_data.map((item) => {
-                if(item.pay_method==0){
-                item.pay_method = "未支付"
-              }else{
-                item.pay_method = item.pay_method == 1 ? '微信支付' :"支付宝支付"
-              }
+                if (item.pay_method == 0) {
+                  item.pay_method = '未支付'
+                } else {
+                  item.pay_method =
+                    item.pay_method == 1 ? '微信支付' : '支付宝支付'
+                }
                 // item.created_at = changeDate(item.created_at)
               })
               orderData.value = res.data.order_data
