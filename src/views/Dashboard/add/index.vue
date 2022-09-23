@@ -11,13 +11,16 @@
       <a-cascader
         v-model:value="formState.user.category"
         :options="options"
+        expand-trigger="hover"
         placeholder="Please select"
         change-on-select
+        :open="open"
+        @click="changeOpen"
         @change="changeChangeChange"
       />
     </a-form-item>
 
-    <a-form-item has-feedback label="商品名称">
+    <a-form-item label="商品名称" :name="['user', 'goods_name']">
       <a-input v-model:value="formState.user.goods_name" />
     </a-form-item>
 
@@ -49,7 +52,7 @@
       <a-input-number v-model:value="formState.user.count" />
     </a-form-item>
 
-    <a-form-item has-feedback label="商品标签" name="pass">
+    <a-form-item label="商品标签" :name="['user', 'tag']">
       <a-input
         v-model:value="formState.user.tag"
         type="text"
@@ -57,14 +60,14 @@
       />
     </a-form-item>
 
-    <a-form-item has-feedback label="上架状态" name="pass">
-      <a-radio-group v-model:value="formState.user.state">
-        <a-radio value="1">上架</a-radio>
-        <a-radio value="0">下架</a-radio>
+    <a-form-item label="上架状态" :name="['user', 'status']">
+      <a-radio-group v-model:value="formState.user.status">
+        <a-radio :value="1">上架</a-radio>
+        <a-radio :value="0">下架</a-radio>
       </a-radio-group>
     </a-form-item>
 
-    <a-form-item has-feedback label="商品主图" name="f1">
+    <a-form-item label="商品主图" :name="['fileList']">
       <a-upload
         v-model:file-list="fileList"
         name="avatar"
@@ -75,8 +78,17 @@
         @change="handleChange"
         :customRequest="customRequest"
       >
-        <img v-if="imageUrl" :src="imageUrl" alt="avatar" style="width: 100%" />
-        <img v-if="imageUrl" :src="imageUrl" alt="avatar" style="width: 100%" />
+        <img
+          v-if="imageUrl"
+          :src="imageUrl"
+          alt="avatar"
+          style="
+             {
+              width: 100%;
+              height: 100%;
+            }
+          "
+        />
         <div v-else>
           <loading-outlined v-if="loading"></loading-outlined>
           <plus-outlined v-else></plus-outlined>
@@ -85,8 +97,8 @@
       </a-upload>
     </a-form-item>
 
-    <a-form-item :name="['user', 'moreIntroduction']" label="详细信息">
-      <a-textarea v-model:value="formState.user.moreIntroduction" />
+    <a-form-item :name="['user', 'detail_goods']" label="详细信息">
+      <a-textarea v-model:value="formState.user.detail_goods" />
     </a-form-item>
 
     <a-form-item :wrapper-col="{ ...layout.wrapperCol, offset: 8 }">
@@ -99,8 +111,9 @@
   import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
   import { message } from 'ant-design-vue'
   import { defineComponent, reactive, ref } from 'vue'
-  import { addGoods, uploadImg, getClassInfo } from '@/api/goods'
+  import { addGoods, uploadImg, getClassInfo, updateGoods } from '@/api/goods'
   import store from '@/store'
+  import { useRoute } from 'vue-router'
 
   function getBase64(img, callback) {
     const reader = new FileReader()
@@ -114,28 +127,40 @@
       PlusOutlined,
     },
     setup() {
+      // 路由传来的数据
+      const route = useRoute()
       const formRef = ref()
+      const user = {
+        category: '', // 种类
+        goods_name: '', //名称
+        introduce: '', //介绍
+        detail_goods: '', //详细信息
+        original_price: '', //原价
+        price: '', //售价
+        count: '', // 库存
+        tag: '', //标签
+        state: '', // 上架状态
+        image: '', //主图
+        goods_id: '', //商品id
+      }
       const formState = reactive({
         user: {
           category: '', // 种类
           goods_name: '', //名称
           introduce: '', //介绍
-          moreIntroduction: '', //详细信息
+          detail_goods: '', //详细信息
           original_price: '', //原价
           price: '', //售价
           count: '', // 库存
           tag: '', //标签
-          state: '', // 上架状态
+          status: '', // 上架状态
           image: '', //主图
-          ID: '', //ID
           goods_id: '', //商品id
         },
       })
 
-      if (store.getters['goods/getData'] != false) {
-        formState.user = store.getters['goods/getData']
-        // console.log(formState.user, 'formState.user')
-      }
+      formState.user = store.getters['goods/getData']
+
       let checkAge = async (_rule, value) => {
         if (!value) {
           return Promise.reject('Please input the age')
@@ -205,19 +230,23 @@
       }
 
       const handleFinish = () => {
-        // console.log(formState, 'formState')
-        const proxyObj = formState.user.category
-        // console.log(proxyObj, 'proxyObj')
-        let objString = ''
-        for (let i in proxyObj) {
-          // console.log(proxyObj[i], '1111111')
-          objString = objString + proxyObj[i] + '/'
+        if (Array.isArray(formState.user.category)) {
+          const arr = formState.user.category
+          formState.user.category = arr[arr.length - 1]
         }
-        // console.log(objString, '迭代之后')
-        formState.user.category = objString
-        addGoods(formState.user).then(() => {
-          // console.log(value, '提交成功')
-        })
+        if (route.query.state == 1) {
+          addGoods(formState.user).then(() => {
+            // console.log(value, '提交成功')
+            message.info('添加成功')
+          })
+        } else {
+          updateGoods(formState.user).then(() => {
+            // console.log(value, '修改成功')
+            message.info('修改成功')
+          })
+        }
+        formState.user = user
+        imageUrl.value = ''
       }
 
       const resetForm = () => {
@@ -228,6 +257,9 @@
       const fileList = ref([])
       const loading = ref(false)
       const imageUrl = ref('')
+      if (formState.user.image) {
+        imageUrl.value = formState.user.image
+      }
 
       const handleChange = (info) => {
         info.file.status = 'done'
@@ -238,7 +270,6 @@
         if (info.file.status === 'done') {
           getBase64(info.file.originFileObj, (base64Url) => {
             imageUrl.value = base64Url
-            // console.log(imageUrl.value, '.value.value')
             loading.value = false
           })
         }
@@ -267,7 +298,6 @@
       }
       // 自定义文件上传
       const customRequest = (data) => {
-        // console.log(data)
         const formData = new FormData()
         formData.append('f1', data.file)
         uploadImg(formData).then((res) => {
@@ -277,6 +307,10 @@
 
       // 树形结构
       const options = reactive([])
+      const open = ref(false)
+      const changeOpen = () => {
+        open.value = !open.value
+      }
 
       // 封装请求函数
       const dataDataData = async (preName, curLevel) => {
@@ -300,6 +334,7 @@
 
       const changeChangeChange = (e) => {
         if (e.length == 1 || e.length == 2) {
+          open.value = true
           getClassInfo(e[e.length - 1], e.length + 1).then((value) => {
             let newData = e[e.length - 1]
             let res = value.data.ClassificationName
@@ -317,6 +352,7 @@
                   }
                 }
               } else {
+                open.value = true
                 // 第三层
                 if (options[i].children[0] !== undefined) {
                   for (let j in options[i].children) {
@@ -335,6 +371,8 @@
               }
             }
           })
+        } else {
+          open.value = false
         }
       }
       return {
@@ -356,6 +394,8 @@
         // 树结构
         value: ref([]),
         options,
+        open,
+        changeOpen,
         changeChangeChange,
       }
     },

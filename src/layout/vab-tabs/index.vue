@@ -17,7 +17,7 @@
       </a-tabs>
     </div>
     <div class="vab-tabs-right-panel">
-      <a-dropdown>
+      <!-- <a-dropdown>
         <template v-slot:overlay>
           <a-menu @click="handleClick">
             <a-menu-item key="closeOthersTabs">
@@ -38,19 +38,16 @@
           更多
           <DownOutlined />
         </a-button>
-      </a-dropdown>
+      </a-dropdown> -->
     </div>
   </div>
 </template>
 
 <script>
-  import { DownOutlined } from '@ant-design/icons-vue'
+  // import { DownOutlined } from '@ant-design/icons-vue'
   import { mapActions, mapGetters } from 'vuex'
   export default {
     name: 'VabTabs',
-    components: {
-      DownOutlined,
-    },
     data() {
       return {
         affixTabs: [],

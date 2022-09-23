@@ -21,14 +21,14 @@
           :model="formState"
           v-bind="layout"
           name="nest-messages"
-          :validate-messages="{ required: '${label} is required!' }"
+          :validate-messages="validateMessages"
           @finish="onFinish"
           ref="editUserFormRef"
         >
           <a-form-item
             :name="['user', 'goods_name']"
             label="商品名称"
-            :rules="[{ required: true }]"
+            :rules="rule"
           >
             <a-input v-model:value="formState.user.goods_name" />
           </a-form-item>
@@ -36,6 +36,7 @@
             :name="['user', 'goods_id']"
             label="商品编号"
             v-if="isWrite"
+            :rules="rule"
           >
             <a-input
               v-model:value="formState.user.goods_id"
@@ -45,7 +46,7 @@
           <a-form-item
             :name="['user', 'goods_id']"
             label="商品编号"
-            :rules="[{ required: true }]"
+            :rules="rule"
             v-else-if="!isWrite"
           >
             <a-input
@@ -56,7 +57,7 @@
           <a-form-item
             :name="['user', 'sort_num']"
             label="排序值"
-            :rules="[{ required: true }]"
+            :rules="rule"
           >
             <a-input v-model:value="formState.user.sort_num" />
           </a-form-item>
@@ -85,10 +86,20 @@
           </a>
         </template>
         <template v-else-if="column.dataIndex === 'action'">
-          <a-button type="primary" @click="change(record)">修改</a-button>
-          <a-button type="primary" danger class="del" @click="showModal">
-            删除
-          </a-button>
+          <div style="white-space: nowrap">
+            <a-button type="primary" @click="change(record)">修改</a-button>
+            <!-- <a-button type="primary" danger class="del" @click="showModal(record)">
+              删除
+            </a-button> -->
+            <a-popconfirm
+              title="确定是否删除?"
+              ok-text="是"
+              cancel-text="否"
+              @confirm="delOne(record)"
+            >
+              <a-button type="primary" danger class="del">删除</a-button>
+            </a-popconfirm>
+          </div>
         </template>
       </template>
     </a-table>
@@ -111,22 +122,27 @@
     delRecommendGoods,
     updateRecommendGoods,
   } from '@/api/recommend.js'
+  import { message } from 'ant-design-vue'
   const columns = [
     {
       title: '商品名称',
       dataIndex: 'goods_name',
+      ellipsis: true,
     },
     {
       title: '排序值',
       dataIndex: 'sort_num',
+      ellipsis: true,
     },
     {
       title: '商品编号',
       dataIndex: 'goods_id',
+      ellipsis: true,
     },
     {
       title: '添加时间',
       dataIndex: 'created_at',
+      ellipsis: true,
     },
     {
       title: '操作',
@@ -147,62 +163,79 @@
       const isWrite = ref(true)
       const state = reactive({
         selectedRowKeys: [],
-        // Check here to configure the default column
+        selectedRowKey: [],
       })
+      // 当前页面
+      const nowPage = ref(1)
       // 表单信息
-      const formState = {
+      let formState = reactive({
         user: {
           goods_id: '',
           goods_name: '',
           sort_num: '',
           created_at: '',
         },
-        cobyUser: {
-          goods_id: '',
-          goods_name: '',
-          sort_num: '',
-          created_at: '',
-        },
-      }
+      })
       // 分页
       const pagination = reactive({
         showLessItems: true,
         defaultPageSize: 5,
         total: 0,
       })
+      let rule = [{ required: true, message: '不能为空!', trigger: 'change' }]
       //分页查询
       const changePage = (e) => {
-        findRecommendGoods({ page: e.current, size: e.pageSize })
-          .then(function (res) {
+        nowPage.value = e.current
+        findRecommendGoods({ page: e.current, size: e.pageSize }).then(
+          function (res) {
             data.arr = res.data.kind_goods
-          })
-          .catch(function (error) {
-            console.log(error)
-          })
-          .then(function () {})
+          }
+        )
       }
 
       //展示受否删除框
       const showModal = () => {
         visible.value = true
       }
-      // 用来批量删除
+      // 用来删除
+      const delOne = (record) => {
+        let goods_id = record.goods_id
+        state.selectedRowKey = [goods_id]
+        delRecommendGoods({ goods_ids: state.selectedRowKey }).then(
+          function () {
+            message.info('删除成功')
+            currentPage()
+          }
+        )
+        setTimeout(() => {
+          state.selectedRowKey = []
+        }, 1000)
+      }
       const handleOk = () => {
         visible.value = false
-        delRecommendGoods({ goods_ids: state.selectedRowKeys })
-          .then(function (res) {
-            console.log(res)
-          })
-          .catch(function (error) {
-            console.log(error)
-          })
-          .then(function () {
-            finddata()
-          })
-        console.log(state.selectedRowKeys)
+        delRecommendGoods({ goods_ids: state.selectedRowKeys }).then(
+          function () {
+            message.info('删除成功')
+            currentPage()
+          }
+        )
         setTimeout(() => {
           state.selectedRowKeys = []
         }, 1000)
+      }
+
+      //封装判断页数逻辑
+      const currentPage = () => {
+        if (nowPage.value == 1) {
+          update()
+        } else if (
+          pagination.total % 5 == 1 &&
+          Math.floor(pagination.total / 5) == nowPage.value - 1
+        ) {
+          updateOther(nowPage.value - 1)
+        } else {
+          updateOther(nowPage.value)
+        }
       }
       // 添加商品
 
@@ -222,17 +255,12 @@
 
       //选中删除的元素
       const onSelectChange = (selectedRowKeys) => {
-        console.log('选中了', selectedRowKeys)
         state.selectedRowKeys = selectedRowKeys
       }
       // 修改
       const change = (record) => {
         formvisible.value = true
-        formState.cobyUser = record
-        formState.user.goods_name = record.goods_name
-        formState.user.sort_num = record.sort_num
-        formState.user.goods_id = record.goods_id
-        console.log(record)
+        formState.user = { ...record }
         isWrite.value = true
       }
 
@@ -250,64 +278,59 @@
       const onFinish = (values) => {
         formvisible.value = false
         formState.user.created_at = getNowtime()
-        //拷贝值
-        let nowData = { ...formState.cobyUser }
 
         if (isWrite.value === false) {
           addRecommendGoods({
             goods_name: values.user.goods_name,
             goods_id: Number(values.user.goods_id),
             sort_num: Number(values.user.sort_num),
+          }).then(function () {
+            message.info('新增成功')
+            if (nowPage.value == 1) {
+              update()
+            } else {
+              updateOther(nowPage.value)
+            }
           })
-            .then(function (res) {
-              console.log(res)
-            })
-            .catch(function (error) {
-              console.log(error)
-            })
-            .then(function () {
-              finddata()
-            })
         } else {
-          console.log(
-            values.user.goods_name,
-            nowData.goods_id,
-            values.user.sort_num
-          )
           updateRecommendGoods({
             goods_name: values.user.goods_name,
-            goods_id: Number(nowData.goods_id),
+            goods_id: Number(formState.user.goods_id),
             sort_num: Number(values.user.sort_num),
+          }).then(function () {
+            message.info('修改成功')
+            if (nowPage.value == 1) {
+              update()
+            } else {
+              updateOther(nowPage.value)
+            }
           })
-            .then(function (res) {
-              console.log(res)
-            })
-            .catch(function (error) {
-              console.log(error)
-            })
-            .then(function () {
-              finddata()
-            })
         }
         setTimeout(() => {
           state.selectedRowKeys = []
+          formState.user = {}
         }, 1000)
       }
-
-      //请求数据方法
-      const finddata = () => {
-        findRecommendGoods({ page: 1, size: pagination.defaultPageSize })
-          .then(function (res) {
-            data.arr = res.data.kind_goods
-            pagination.total = res.data.size
-          })
-          .catch(function (error) {
-            console.log(error)
-          })
-          .then(function () {})
+      const validateMessages = {
+        required: '${label} is required!',
       }
+      //更新第一页数据
+      const update = () => {
+        findRecommendGoods({ page: 1, size: 5 }).then(function (res) {
+          data.arr = res.data.kind_goods
+          pagination.total = res.data.size
+        })
+      }
+      //更新对应页数据
+      function updateOther(current) {
+        findRecommendGoods({ page: current, size: 5 }).then(function (res) {
+          data.arr = res.data.kind_goods
+          pagination.total = res.data.size
+        })
+      }
+
       onMounted(() => {
-        finddata()
+        update()
       })
       return {
         data,
@@ -329,6 +352,9 @@
         changePage,
         flushForm,
         editUserFormRef,
+        validateMessages,
+        rule,
+        delOne,
       }
     },
   })

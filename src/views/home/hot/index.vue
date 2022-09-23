@@ -391,12 +391,14 @@
     height: 100px;
     width: 100px;
   }
+
   .del {
     margin-left: 10px;
   }
   .ant-btn {
     margin-left: 10px;
   }
+
   .goodsid {
     width: 150px;
   }

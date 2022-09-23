@@ -13,7 +13,7 @@
       </a-col>
       <a-col :span="8">
         <a-card title="转化率" :bordered="false" class="da_card">
-          <p>{{ ConversionRate }}</p>
+          <p>{{ `${ConversionRate}%` }}</p>
         </a-card>
       </a-col>
     </a-row>
@@ -132,9 +132,7 @@
         ],
       })
       let ConversionRate = computed(() => {
-        let Rate = Math.trunc(
-          (option.series[1].data[6] / option.series[2].data[6]) * 100
-        )
+        let Rate = (option.series[1].data[6] / option.series[2].data[6]) * 100
         if (!Rate) {
           return 0
         }
