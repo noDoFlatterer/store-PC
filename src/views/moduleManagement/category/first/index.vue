@@ -1,9 +1,7 @@
 <template>
   <div>
     <div>
-      <a-button @click="showInput()" type="primary" href="javascript:;">
-        增加商品
-      </a-button>
+      <a-button @click="showInput" type="primary">增加分类</a-button>
       <a-button
         danger
         type="primary"
@@ -11,63 +9,48 @@
         :loading="loading"
         @click="deleteAll"
         class="add"
-        href="javascript:;"
       >
         批量删除
       </a-button>
       <!-- 表单 -->
       <a-modal
-        href="javascript:;"
+        :footer="null"
         v-model:visible="formvisible"
         title="添加分类"
-        class="add"
+        @cancel="cancel"
       >
         <a-form
-          href="javascript:;"
           :model="formState"
           v-bind="layout"
           name="nest-messages"
           :validate-messages="validateMessages"
           @finish="onFinish"
+          ref="editUserFormRef"
         >
           <a-form-item
-            href="javascript:;"
             label="分类名称"
             :name="['user', 'class_name']"
             :rules="[{ required: true }]"
           >
-            <a-input
-              href="javascript:;"
-              v-model:value="formState.user.class_name"
-            />
+            <a-input v-model:value="formState.user.class_name" />
           </a-form-item>
 
           <a-form-item
-            href="javascript:;"
             label="排序值"
             :name="['user', 'sort_num']"
             :rules="[{ required: true }]"
           >
-            <a-input
-              href="javascript:;"
-              v-model:value="formState.user.sort_num"
-            />
+            <a-input v-model:value="formState.user.sort_num" />
           </a-form-item>
 
-          <a-form-item
-            href="javascript:;"
-            :wrapper-col="{ offset: 8, span: 16 }"
-          >
-            <a-button type="primary" html-type="submit" href="javascript:;">
-              提交
-            </a-button>
+          <a-form-item :wrapper-col="{ ...layout.wrapperCol, offset: 8 }">
+            <a-button type="primary" html-type="submit">提交</a-button>
           </a-form-item>
         </a-form>
       </a-modal>
     </div>
 
     <a-table
-      href="javascript:;"
       :row-selection="rowSelection"
       :columns="columns"
       :data-source="data.arr"
@@ -77,26 +60,14 @@
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'done'">
-          <a-radio-group href="javascript:;">
-            <a-radio-button
-              @click="change(record)"
-              value="small"
-              href="javascript:;"
-            >
+          <a-radio-group>
+            <a-radio-button @click="change(record)" value="small">
               修改
             </a-radio-button>
-            <a-radio-button
-              @click="next(record)"
-              value="small"
-              href="javascript:;"
-            >
+            <a-radio-button @click="next(record)" value="small">
               下级分类
             </a-radio-button>
-            <a-radio-button
-              @click="deleteOne(record)"
-              value="small"
-              href="javascript:;"
-            >
+            <a-radio-button @click="deleteOne(record)" value="small">
               删除
             </a-radio-button>
           </a-radio-group>
@@ -112,34 +83,11 @@
 
   export default defineComponent({
     setup() {
-      // 请求函数
-      // 请求数据
-      const getData = (obj) => {
-        find(obj).then((value) => {
-          data.arr = value.data.Categories
-          pagination.total = value.data.Number
-        })
-      }
-      // 删除请求封装
-      const deleteOther = (arr) => {
-        deleteData(arr).then(() => {
-          getData(firstObj)
-        })
-      }
-
-      const firstObj = {
-        Page: 1,
-        PreName: '无',
-        Size: 5,
-        PreCategory: 0,
-      }
-      getData(firstObj)
-
       const columns = [
         {
           title: '分类名称',
           dataIndex: 'ClassName',
-          width: '49% ',
+          width: '40% ',
         },
         {
           title: '排序值',
@@ -154,12 +102,43 @@
         {
           title: '操作',
           dataIndex: 'done',
-          width: '21% ',
+          width: '30% ',
         },
       ]
       const data = reactive({
         arr: [],
       })
+      // 页码
+      let pages = reactive(1)
+      // 请求函数
+      // 请求数据
+      const getData = (obj) => {
+        find(obj).then((value) => {
+          // console.log(obj, '请求传入的数据')
+          data.arr = value.data.Categories
+          pagination.total = value.data.Number
+        })
+      }
+      // 删除请求封装
+      const deleteOther = (arr) => {
+        deleteData(arr).then(() => {
+          const firstObj1 = {
+            Page: pages,
+            PreName: '无',
+            Size: 5,
+            PreCategory: 0,
+          }
+          getData(firstObj1)
+        })
+      }
+
+      const firstObj = {
+        Page: 1,
+        PreName: '无',
+        Size: 5,
+        PreCategory: 0,
+      }
+      getData(firstObj)
 
       const visible = ref(false)
       const formvisible = ref(false)
@@ -174,6 +153,7 @@
           sort_num: '',
         },
       }
+
       // 旧数据
       const oldData = {
         user: {
@@ -185,17 +165,15 @@
       let addOrChange = ref(true) // 最好不要用 reactive，reactive里面尽量不写布尔值，会报警告
       // 呼出新增表单
       const showInput = () => {
-        addOrChange = true
-
+        addOrChange.value = true
         formState.user.class_name = ''
         formState.user.sort_num = ''
-
         formvisible.value = true
       }
 
       // 修改
       const change = (record) => {
-        addOrChange = false
+        addOrChange.value = false
         oldData.user.class_name = record.ClassName
         oldData.user.sort_num = record.SortNum
         formState.user.class_name = record.ClassName
@@ -225,11 +203,18 @@
           range: '${label} must be between ${min} and ${max}',
         },
       }
+      const editUserFormRef = ref()
+      const cancel = () => {
+        editUserFormRef.value.resetFields()
+      }
 
       // 完成提交
       const onFinish = (values) => {
+        // console.log(addOrChange.value)
+        // console.log('111111111111')
         formvisible.value = false //收起来弹出框
         if (addOrChange.value) {
+          // console.log('新增')
           const obj = {
             class_name: values.user.class_name,
             pre_name: '无',
@@ -237,9 +222,17 @@
             sort_num: Number(values.user.sort_num),
           }
           addData(obj).then(() => {
-            getData(firstObj)
+            // console.log('成功了', value)
+            const firstObj1 = {
+              Page: pages,
+              PreName: '无',
+              Size: 5,
+              PreCategory: 0,
+            }
+            getData(firstObj1)
           })
         } else {
+          // console.log('修改')
           const obj = {
             name: values.user.class_name,
             pre_name: oldData.user.class_name,
@@ -247,7 +240,14 @@
             sort_num: Number(values.user.sort_num),
           }
           update(obj).then(() => {
-            getData(firstObj)
+            // console.log('成功了', value)
+            const firstObj1 = {
+              Page: pages,
+              PreName: '无',
+              Size: 5,
+              PreCategory: 0,
+            }
+            getData(firstObj1)
           })
         }
       }
@@ -273,17 +273,20 @@
       const pagination = reactive({
         showLessItems: true,
         showQuickJumper: true,
-        showSizeChanger: true,
+        showSizeChanger: false,
         defaultPageSize: 5,
         total: 20,
       })
+
       const changePag = (e) => {
+        pages = e.current
         const obj = {
           Page: e.current,
           PreName: '无',
           Size: 5,
           PreCategory: 0,
         }
+        // console.log(obj)
         find(obj, 5).then((value) => {
           data.arr = value.data.Categories
         })
@@ -292,6 +295,7 @@
       // 路由跳转
       var router = useRouter()
       const next = (record) => {
+        // console.log(record.ClassName)
         router.push({
           name: 'secondCategory',
           query: {
@@ -315,6 +319,8 @@
         formState,
         onFinish,
         showInput,
+        editUserFormRef,
+        cancel,
         //  分页
         pagination,
         rowSelection,
@@ -331,6 +337,6 @@
 
 <style>
   .add {
-    margin-left: 10px;
+    margin-left: 5px;
   }
 </style>

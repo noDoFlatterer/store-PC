@@ -26,17 +26,17 @@
     </a-form-item>
 
     <a-form-item
-      :name="['user', 'oldPrice']"
+      :name="['user', 'original_price']"
       label="商品价格"
-      :rules="[{ type: 'number', min: 0, max: 99 }]"
+      :rules="[{ type: 'number', min: 0, max: 9999 }]"
     >
-      <a-input-number v-model:value="formState.user.oldPrice" />
+      <a-input-number v-model:value="formState.user.original_price" />
     </a-form-item>
 
     <a-form-item
       :name="['user', 'price']"
       label="商品售卖价价格"
-      :rules="[{ type: 'number', min: 0, max: 99 }]"
+      :rules="[{ type: 'number', min: 0, max: 99999 }]"
     >
       <a-input-number v-model:value="formState.user.price" />
     </a-form-item>
@@ -44,7 +44,7 @@
     <a-form-item
       :name="['user', 'count']"
       label="商品库存"
-      :rules="[{ type: 'number', min: 0, max: 99 }]"
+      :rules="[{ type: 'number', min: 0, max: 99999 }]"
     >
       <a-input-number v-model:value="formState.user.count" />
     </a-form-item>
@@ -59,8 +59,8 @@
 
     <a-form-item has-feedback label="上架状态" name="pass">
       <a-radio-group v-model:value="formState.user.state">
-        <a-radio value="1">上架1</a-radio>
-        <a-radio value="0">下架0</a-radio>
+        <a-radio value="1">上架</a-radio>
+        <a-radio value="0">下架</a-radio>
       </a-radio-group>
     </a-form-item>
 
@@ -75,6 +75,7 @@
         @change="handleChange"
         :customRequest="customRequest"
       >
+        <img v-if="imageUrl" :src="imageUrl" alt="avatar" style="width: 100%" />
         <img v-if="imageUrl" :src="imageUrl" alt="avatar" style="width: 100%" />
         <div v-else>
           <loading-outlined v-if="loading"></loading-outlined>
@@ -93,6 +94,7 @@
     </a-form-item>
   </a-form>
 </template>
+
 <script>
   import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
   import { message } from 'ant-design-vue'
@@ -132,6 +134,7 @@
 
       if (store.getters['goods/getData'] != false) {
         formState.user = store.getters['goods/getData']
+        // console.log(formState.user, 'formState.user')
       }
       let checkAge = async (_rule, value) => {
         if (!value) {
@@ -201,11 +204,19 @@
         },
       }
 
-      const handleFinish = (values) => {
-        console.log(values, formState)
-        console.log(values.user, '1111111')
-        addGoods(values.user).then((value) => {
-          console.log(value, '提交成功')
+      const handleFinish = () => {
+        // console.log(formState, 'formState')
+        const proxyObj = formState.user.category
+        // console.log(proxyObj, 'proxyObj')
+        let objString = ''
+        for (let i in proxyObj) {
+          // console.log(proxyObj[i], '1111111')
+          objString = objString + proxyObj[i] + '/'
+        }
+        // console.log(objString, '迭代之后')
+        formState.user.category = objString
+        addGoods(formState.user).then(() => {
+          // console.log(value, '提交成功')
         })
       }
 
@@ -225,9 +236,9 @@
           return
         }
         if (info.file.status === 'done') {
-          // Get this url from response in real world.
           getBase64(info.file.originFileObj, (base64Url) => {
             imageUrl.value = base64Url
+            // console.log(imageUrl.value, '.value.value')
             loading.value = false
           })
         }
@@ -256,7 +267,7 @@
       }
       // 自定义文件上传
       const customRequest = (data) => {
-        console.log(data)
+        // console.log(data)
         const formData = new FormData()
         formData.append('f1', data.file)
         uploadImg(formData).then((res) => {
@@ -281,7 +292,7 @@
               label: res[i],
               children: [],
             }
-            options.push(obj)
+            options[i] = obj
           }
         })
       }
@@ -292,22 +303,31 @@
           getClassInfo(e[e.length - 1], e.length + 1).then((value) => {
             let newData = e[e.length - 1]
             let res = value.data.ClassificationName
-            for (let i in res) {
-              const obj = {
-                value: res[i],
-                label: res[i],
-                children: [],
-              }
-              for (let i in options) {
-                if (e.length + 1 == 2) {
-                  if (options[i].value == newData) {
-                    options[i].children.push(obj)
+            for (let i in options) {
+              if (e.length + 1 == 2) {
+                // 第二层
+                if (options[i].value == newData) {
+                  for (let k in res) {
+                    const obj = {
+                      value: res[k],
+                      label: res[k],
+                      children: [],
+                    }
+                    options[i].children[k] = obj
                   }
-                } else {
-                  if (options[i].children[0] !== undefined) {
-                    for (let j in options[i].children) {
-                      if (options[i].children[j].value == newData) {
-                        options[i].children[j].children.push(obj)
+                }
+              } else {
+                // 第三层
+                if (options[i].children[0] !== undefined) {
+                  for (let j in options[i].children) {
+                    if (options[i].children[j].value == newData) {
+                      for (let k in res) {
+                        const obj = {
+                          value: res[k],
+                          label: res[k],
+                          children: [],
+                        }
+                        options[i].children[j].children[k] = obj
                       }
                     }
                   }

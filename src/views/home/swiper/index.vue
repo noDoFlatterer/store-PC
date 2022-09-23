@@ -13,16 +13,19 @@
       <a-modal v-model:visible="visible" @ok="handleOk">
         <p>确定要删除吗</p>
       </a-modal>
-      <a-button type="primary" class="add" @click="add">添加</a-button>
+      <a-button type="primary" class="add" @click="add" @cancel="cancel">
+        添加
+      </a-button>
 
       <!-- 添加的表单 -->
-      <a-modal v-model:visible="formvisible" :footer="null" title="添加轮播图">
+      <a-modal v-model:visible="formvisible" :footer="null" :title="title">
         <a-form
           :model="formState"
           v-bind="layout"
           name="nest-messages"
           :validate-messages="validateMessages"
           @finish="onFinish"
+          ref="formRef"
         >
           <a-form-item
             :name="['user', 'image']"
@@ -31,7 +34,7 @@
               {
                 required: true,
                 message: '图片不能为空!',
-                trigger: ['blur', 'change'],
+                trigger: 'change',
               },
             ]"
           >
@@ -81,12 +84,10 @@
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'img'">
-          <img :src="record.image" alt="" srcset="" />
+          <img :src="record.image" alt srcset />
         </template>
         <template v-else-if="column.key === 'addtime'">
-          <a>
-            {{ record.addtime }}
-          </a>
+          <a>{{ record.addtime }}</a>
         </template>
         <template v-else-if="column.key === 'action'" class="aaa">
           <a-button type="primary" @click="change(record)">修改</a-button>
@@ -178,6 +179,7 @@
       PlusOutlined,
     },
     setup() {
+      const formRef = ref()
       // 表单信息
       const formState = reactive({
         user: {
@@ -208,7 +210,9 @@
           updateOther(page.pageSize, page.current)
         }
       }
-
+      const cancel = () => {
+        formRef.value.resetFields()
+      }
       // 用来批量删除
       const handleOk = () => {
         visible.value = false
@@ -252,8 +256,10 @@
       // 是否打开
       const visible = ref(false)
       const formvisible = ref(false)
+      const title = ref('添加轮播图')
       // 添加
       const add = () => {
+        title.value = '添加轮播图'
         formvisible.value = true
         addorchange.value = true
         // 清空表单
@@ -272,9 +278,11 @@
       }
       // 修改按钮
       const change = (record) => {
+        title.value = '修改轮播图'
         formvisible.value = true
         addorchange.value = false
         formState.user = record
+        imageUrl.value = ''
       }
       // 表单
       const layout = {
@@ -316,11 +324,11 @@
           })
         } else {
           // 修改
+          formState.user.image = img.value
           updateSwiper(formState.user).then((res) => {
             message.info(res.data)
           })
           formvisible.value = false
-
           state.loading = true // ajax request after empty completing
         }
         setTimeout(() => {
@@ -330,12 +338,14 @@
       }
       // 校验
       let checksort = async (_rule, value) => {
-        if (value > 100) {
-          return Promise.reject('输入的值不能大于100')
+        if (value > 10000) {
+          return Promise.reject('输入的值不能大于10000')
         } else if (value == null) {
           return Promise.reject('输入的值不能为空')
-        } else if (value < 0) {
-          return Promise.reject('输入的值不能小于零')
+        } else if (value <= 0) {
+          return Promise.reject('输入的值不能小于等于零')
+        } else if (value % 1 != 0) {
+          return Promise.reject('输入的值只能为整数')
         } else {
           return Promise.resolve()
         }
@@ -354,7 +364,7 @@
           return
         }
         if (info.file.status === 'done') {
-          formState.user.image = 1
+          // formState.user.image = 1
           // Get this url from response in real world.
           getBase64(info.file.originFileObj, (base64Url) => {
             imageUrl.value = base64Url
@@ -382,11 +392,12 @@
         return isJpgOrPng && isLt2M
       }
       // 自定义文件上传
+      const img = ref()
       const customRequest = (data) => {
         const formData = new FormData()
         formData.append('f1', data.file)
         upPhotos(formData).then((res) => {
-          formState.user.image = res.data
+          img.value = res.data
         })
       }
       // 更新第一页数据
@@ -437,6 +448,10 @@
         nowPage,
         updateOther,
         checksort,
+        img,
+        cancel,
+        formRef,
+        title,
       }
     },
   })

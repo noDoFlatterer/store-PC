@@ -19,7 +19,7 @@
       <a-modal
         v-model:visible="formvisible"
         :footer="null"
-        title="添加轮播图"
+        :title="title"
         @cancel="cancel"
       >
         <a-form
@@ -44,6 +44,7 @@
             :rules="[{ required: true }]"
           >
             <a-input-number
+              :disabled="isshow"
               class="goodsid"
               v-model:value="formState.user.goods_id"
             />
@@ -73,12 +74,11 @@
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <a-button type="primary" @click="change(record)">修改</a-button>
-
           <a-popconfirm
             title="确定是否删除?"
             ok-text="是"
             cancel-text="否"
-            @confirm="delOne(record)"
+            @confirm="delone(record)"
           >
             <a-button type="primary" danger class="del">删除</a-button>
           </a-popconfirm>
@@ -191,7 +191,6 @@
       const changePage = (page) => {
         nowPage.value = page.current
         update(page.current)
-        console.log(page)
       }
       const showModal = () => {
         visible.value = true
@@ -235,12 +234,16 @@
           state.selectedRowKeys = []
         }, 1000)
       }
+      const isshow = ref(true)
+      const title = ref('添加热销商品')
       // 添加
       const add = () => {
+        title.value = '添加热销商品'
         formvisible.value = true
         addorchange.value = true
         // 清空表单
         formState.user = {}
+        isshow.value = false
       }
 
       const hasSelected = computed(() => state.selectedRowKeys.length > 0)
@@ -251,8 +254,10 @@
       }
       // 修改
       const change = (record) => {
+        title.value = '修改热销商品'
         formvisible.value = true
         addorchange.value = false
+        isshow.value = true
         formState.user = {
           goods_name: record.goods_name,
           goods_id: record.goods_id,
@@ -270,26 +275,30 @@
         },
       }
       let checksort = async (_rule, value) => {
-        if (value > 100) {
-          return Promise.reject('输入的值不能大于100')
+        if (value > 10000) {
+          return Promise.reject('输入的值不能大于10000')
         } else if (value == null) {
           return Promise.reject('输入的值不能为空')
-        } else if (value < 0) {
-          return Promise.reject('输入的值不能小于零')
+        } else if (value <= 0) {
+          return Promise.reject('输入的值不能小于等于零')
+        } else if (value % 1 != 0) {
+          return Promise.reject('输入的值只能为整数！')
         } else {
           return Promise.resolve()
         }
       }
 
       let checkname = async (_rule, value) => {
-        if (value.length > 10) {
+        if (value == null) {
+          return Promise.reject('输入的值不能为空')
+        } else if (value.length > 10) {
           return Promise.reject('输入商品名称长度不能大于10')
         } else {
           return Promise.resolve()
         }
       }
       const validateMessages = {
-        required: '${label} is required!',
+        required: '${label} 不能为空!',
         types: {
           email: '${label} is not a valid email!',
           number: '${label} is not a valid number!',
@@ -371,6 +380,8 @@
         delone,
         checksort,
         checkname,
+        isshow,
+        title,
       }
     },
   })
