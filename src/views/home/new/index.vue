@@ -27,7 +27,7 @@
           <a-form-item
             :name="['user', 'goods_name']"
             label="商品名称"
-            :rules="rule"
+            :rules="[{ required: true, validator: checkname }]"
           >
             <a-input v-model:value="formState.user.goods_name" />
           </a-form-item>
@@ -44,7 +44,7 @@
           <a-form-item
             :name="['user', 'goods_id']"
             label="商品编号"
-            :rules="rule"
+            :rules="[{ required: true }]"
             v-else-if="!isWrite"
           >
             <a-input
@@ -55,7 +55,7 @@
           <a-form-item
             :name="['user', 'sort_num']"
             label="排序值"
-            :rules="rule"
+            :rules="[{ required: true, validator: checksort }]"
           >
             <a-input v-model:value="formState.user.sort_num" />
           </a-form-item>
@@ -78,12 +78,7 @@
       @change="changePage"
     >
       <template #bodyCell="{ column, record }">
-        <template v-if="column.dataIndex === 'created_at'">
-          <a>
-            {{ record.created_at }}
-          </a>
-        </template>
-        <template v-else-if="column.dataIndex === 'action'">
+        <template v-if="column.dataIndex === 'action'">
           <div style="white-space: nowrap">
             <a-button type="primary" @click="change(record)">修改</a-button>
             <a-popconfirm
@@ -178,6 +173,31 @@
         total: 0,
       })
       let rule = [{ required: true, message: '不能为空!', trigger: 'change' }]
+
+      //输入框校验
+      let checksort = async (_rule, value) => {
+        if (value > 10000) {
+          return Promise.reject('输入的值不能大于10000')
+        } else if (value == null) {
+          return Promise.reject('输入的值不能为空')
+        } else if (value <= 0) {
+          return Promise.reject('输入的值不能小于等于零')
+        } else if (value % 1 != 0) {
+          return Promise.reject('输入的值只能为整数！')
+        } else {
+          return Promise.resolve()
+        }
+      }
+
+      let checkname = async (_rule, value) => {
+        if (value == null) {
+          return Promise.reject('输入的值不能为空')
+        } else if (value.length > 10) {
+          return Promise.reject('输入商品名称长度不能大于10')
+        } else {
+          return Promise.resolve()
+        }
+      }
       //分页查询
       const changePage = (e) => {
         nowPage.value = e.current
@@ -346,6 +366,8 @@
         rule,
         nowPage,
         delOne,
+        checksort,
+        checkname,
       }
     },
   })
