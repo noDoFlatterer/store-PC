@@ -43,7 +43,6 @@
     "eslint-plugin-vue": "^7.13.0",
     "filemanager-webpack-plugin": "^6.1.4",
     "image-webpack-loader": "^7.0.1",
-    "imagemin-gifsicle": "^2.0.0",
     "less": "^4.1.1",
     "less-loader": "^7.3.0",
     "prettier": "^2.3.2",
@@ -52,7 +51,8 @@
     "stylelint-config-recess-order": "^2.4.0",
     "svg-sprite-loader": "^6.0.9",
     "vab-config": "0.0.8",
-    "webpackbar": "^5.0.0-3"
+    "webpackbar": "^5.0.0-3",
+    "imagemin-gifsicle": "^2.0.0"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"

@@ -13,12 +13,15 @@
       <a-modal v-model:visible="visible" @ok="handleOk">
         <p>确定要删除吗</p>
       </a-modal>
-      <a-button type="primary" class="add" @click="add" @cancel="cancel">
-        添加
-      </a-button>
+      <a-button type="primary" class="add" @click="add">添加</a-button>
 
       <!-- 添加的表单 -->
-      <a-modal v-model:visible="formvisible" :footer="null" :title="title">
+      <a-modal
+        v-model:visible="formvisible"
+        :footer="null"
+        :title="title"
+        @cancel="cancel"
+      >
         <a-form
           :model="formState"
           v-bind="layout"
@@ -28,7 +31,7 @@
           ref="formRef"
         >
           <a-form-item
-            :name="['user', 'image']"
+            :name="['fileList']"
             label="图片"
             :rules="[
               {
@@ -187,7 +190,7 @@
           sort_num: 1,
           created_at: '',
         },
-        fileList: {},
+        fileList: '',
       })
 
       // 分页
@@ -264,6 +267,7 @@
         addorchange.value = true
         // 清空表单
         formState.user = {}
+        formState.fileList = ''
         imageUrl.value = ''
       }
       // 判断选中内容
@@ -282,6 +286,8 @@
         formvisible.value = true
         addorchange.value = false
         formState.user = record
+        // formState.user.image = ''
+        formState.fileList = ''
         imageUrl.value = ''
       }
       // 表单
@@ -310,7 +316,7 @@
           formvisible.value = false
           state.loading = true // ajax request after empty completing
           const test = {
-            image: formState.user.image,
+            image: img.value,
             sort_number: formState.user.sort_num,
           }
           console.log(test)
@@ -364,7 +370,9 @@
           return
         }
         if (info.file.status === 'done') {
-          // formState.user.image = 1
+          // if (addorchange.value == true) {
+          formState.fileList = 1
+          // }
           // Get this url from response in real world.
           getBase64(info.file.originFileObj, (base64Url) => {
             imageUrl.value = base64Url
