@@ -51,7 +51,8 @@
     "stylelint-config-recess-order": "^2.4.0",
     "svg-sprite-loader": "^6.0.9",
     "vab-config": "0.0.8",
-    "webpackbar": "^5.0.0-3"
+    "webpackbar": "^5.0.0-3",
+    "imagemin-gifsicle": "^2.0.0"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
