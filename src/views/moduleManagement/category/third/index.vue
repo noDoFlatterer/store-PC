@@ -41,7 +41,7 @@
           <a-form-item
             label="分类名称"
             :name="['user', 'class_name']"
-            :rules="[{ required: true }]"
+            :rules="[{ required: true, validator: checkName }]"
           >
             <a-input v-model:value="formState.user.class_name" />
           </a-form-item>
@@ -49,7 +49,7 @@
           <a-form-item
             label="排序值"
             :name="['user', 'sort_num']"
-            :rules="[{ required: true }]"
+            :rules="[{ type: 'number', required: true, validator: checkSort }]"
           >
             <a-input v-model:value="formState.user.sort_num" />
           </a-form-item>
@@ -202,11 +202,34 @@
         loading: false,
       })
       // 表单信息
-      const formState = {
+      const formState = reactive({
         user: {
           class_name: '',
           sort_num: '',
         },
+      })
+      let checkSort = async (_rule, value) => {
+        if (value > 10000) {
+          return Promise.reject('输入的值不能大于10000')
+        } else if (value == null) {
+          return Promise.reject('输入的值不能为空')
+        } else if (value <= 0) {
+          return Promise.reject('输入的值不能小于等于零')
+        } else if (value % 1 != 0) {
+          return Promise.reject('输入的值只能为整数！')
+        } else {
+          return Promise.resolve()
+        }
+      }
+
+      let checkName = async (_rule, value) => {
+        if (value == null) {
+          return Promise.reject('输入的值不能为空')
+        } else if (value.length > 6) {
+          return Promise.reject('输入商品名称长度不能大于6')
+        } else {
+          return Promise.resolve()
+        }
       }
       // 旧数据
       const oldData = {
@@ -359,6 +382,8 @@
         showModal,
         change,
         // 表单
+        checkName,
+        checkSort,
         layout,
         validateMessages,
         formState,
@@ -380,7 +405,7 @@
   })
 </script>
 
-<style>
+<style scoped>
   .add {
     margin-left: 10px;
   }
