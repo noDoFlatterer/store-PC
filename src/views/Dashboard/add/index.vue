@@ -154,9 +154,9 @@
         price: '', //售价
         count: '', // 库存
         tag: '', //标签
-        state: 0, // 上架状态
+        state: '', // 上架状态
         image: '', //主图
-        goods_id: 0, //商品id
+        // goods_id: 1, //商品id
       }
       const formState = reactive({
         user: {
@@ -168,9 +168,9 @@
           price: '', //售价
           count: '', // 库存
           tag: '', //标签
-          status: 0, // 上架状态
+          status: '', // 上架状态
           image: '', //主图
-          goods_id: 0, //商品id
+          // goods_id: '1111111111111111111', //商品id
         },
       })
 
@@ -307,6 +307,7 @@
         } else {
           console.log(formState.user)
           console.log(route.query.state)
+          formState.user.goods_id = 1
           addGoods(formState.user).then(() => {
             // console.log(value, '提交成功')
             message.info('添加成功')
@@ -315,10 +316,7 @@
         formState.user = user
         imageUrl.value = ''
         router.push({
-          name: 'add',
-          query: {
-            state: 0,
-          },
+          name: 'goods',
         })
       }
 
