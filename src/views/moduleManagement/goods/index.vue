@@ -193,6 +193,7 @@
         firstPage(5).then((value) => {
           data.arr = value.data.page
           pagination.total = value.data.numsOfAllData
+          console.log(data.arr, 'data.arr')
         })
       }
       getData()

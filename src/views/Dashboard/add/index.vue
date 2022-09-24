@@ -7,7 +7,11 @@
     v-bind="layout"
     @finish="handleFinish"
   >
-    <a-form-item :name="['user', 'category']" label="商品种类">
+    <a-form-item
+      :name="['user', 'category']"
+      label="商品种类"
+      :rules="[{ required: true, validator: checkName }]"
+    >
       <a-cascader
         v-model:value="formState.user.category"
         :options="options"
@@ -20,18 +24,26 @@
       />
     </a-form-item>
 
-    <a-form-item label="商品名称" :name="['user', 'goods_name']">
+    <a-form-item
+      label="商品名称"
+      :name="['user', 'goods_name']"
+      :rules="[{ required: true, validator: checkName }]"
+    >
       <a-input v-model:value="formState.user.goods_name" />
     </a-form-item>
 
-    <a-form-item :name="['user', 'introduce']" label="商品简介">
+    <a-form-item
+      :name="['user', 'introduce']"
+      label="商品简介"
+      :rules="[{ required: true, validator: checkName2 }]"
+    >
       <a-textarea v-model:value="formState.user.introduce" />
     </a-form-item>
 
     <a-form-item
       :name="['user', 'original_price']"
       label="商品价格"
-      :rules="[{ type: 'number', min: 0, max: 9999 }]"
+      :rules="[{ type: 'number', required: true, validator: checkSort }]"
     >
       <a-input-number v-model:value="formState.user.original_price" />
     </a-form-item>
@@ -39,7 +51,7 @@
     <a-form-item
       :name="['user', 'price']"
       label="商品售卖价价格"
-      :rules="[{ type: 'number', min: 0, max: 99999 }]"
+      :rules="[{ type: 'number', required: true, validator: checkSort }]"
     >
       <a-input-number v-model:value="formState.user.price" />
     </a-form-item>
@@ -47,12 +59,16 @@
     <a-form-item
       :name="['user', 'count']"
       label="商品库存"
-      :rules="[{ type: 'number', min: 0, max: 99999 }]"
+      :rules="[{ type: 'number', required: true, validator: checkSort }]"
     >
       <a-input-number v-model:value="formState.user.count" />
     </a-form-item>
 
-    <a-form-item label="商品标签" :name="['user', 'tag']">
+    <a-form-item
+      label="商品标签"
+      :name="['user', 'tag']"
+      :rules="[{ required: true, validator: checkName }]"
+    >
       <a-input
         v-model:value="formState.user.tag"
         type="text"
@@ -60,7 +76,11 @@
       />
     </a-form-item>
 
-    <a-form-item label="上架状态" :name="['user', 'status']">
+    <a-form-item
+      label="上架状态"
+      :name="['user', 'status']"
+      :rules="[{ required: true, validator: checkName }]"
+    >
       <a-radio-group v-model:value="formState.user.status">
         <a-radio :value="1">上架</a-radio>
         <a-radio :value="0">下架</a-radio>
@@ -78,17 +98,7 @@
         @change="handleChange"
         :customRequest="customRequest"
       >
-        <img
-          v-if="imageUrl"
-          :src="imageUrl"
-          alt="avatar"
-          style="
-             {
-              width: 100%;
-              height: 100%;
-            }
-          "
-        />
+        <img v-if="imageUrl" :src="imageUrl" alt="avatar" />
         <div v-else>
           <loading-outlined v-if="loading"></loading-outlined>
           <plus-outlined v-else></plus-outlined>
@@ -97,7 +107,11 @@
       </a-upload>
     </a-form-item>
 
-    <a-form-item :name="['user', 'detail_goods']" label="详细信息">
+    <a-form-item
+      :name="['user', 'detail_goods']"
+      label="详细信息"
+      :rules="[{ required: true, validator: checkName3 }]"
+    >
       <a-textarea v-model:value="formState.user.detail_goods" />
     </a-form-item>
 
@@ -229,17 +243,64 @@
         },
       }
 
+      // 表单校验
+      let checkSort = async (_rule, value) => {
+        if (value > 10000) {
+          return Promise.reject('输入的值不能大于10000')
+        } else if (value == null) {
+          return Promise.reject('输入的值不能为空')
+        } else if (value <= 0) {
+          return Promise.reject('输入的值不能小于等于零')
+        } else if (value % 1 != 0) {
+          return Promise.reject('输入的值只能为整数！')
+        } else {
+          return Promise.resolve()
+        }
+      }
+
+      let checkName = async (_rule, value) => {
+        if (value == null) {
+          return Promise.reject('输入的值不能为空')
+        } else if (value.length > 10) {
+          return Promise.reject('输入商品名称长度不能大于10')
+        } else {
+          return Promise.resolve()
+        }
+      }
+
+      let checkName2 = async (_rule, value) => {
+        if (value == null) {
+          return Promise.reject('输入的值不能为空')
+        } else if (value.length > 50) {
+          return Promise.reject('输入商品名称长度不能大于50')
+        } else {
+          return Promise.resolve()
+        }
+      }
+
+      let checkName3 = async (_rule, value) => {
+        if (value == null) {
+          return Promise.reject('输入的值不能为空')
+        } else if (value.length > 100) {
+          return Promise.reject('输入商品名称长度不能大于100')
+        } else {
+          return Promise.resolve()
+        }
+      }
+
       const handleFinish = () => {
         if (Array.isArray(formState.user.category)) {
           const arr = formState.user.category
           formState.user.category = arr[arr.length - 1]
         }
         if (route.query.state == 1) {
+          console.log(formState.user)
           addGoods(formState.user).then(() => {
             // console.log(value, '提交成功')
             message.info('添加成功')
           })
         } else {
+          console.log(formState.user)
           updateGoods(formState.user).then(() => {
             // console.log(value, '修改成功')
             message.info('修改成功')
@@ -376,6 +437,12 @@
         }
       }
       return {
+        // 表单校验
+        checkName,
+        checkName2,
+        checkName3,
+        checkSort,
+
         formState,
         formRef,
         rules,
@@ -402,6 +469,11 @@
   })
 </script>
 <style scoped>
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
   .avatar-uploader > .ant-upload {
     width: 128px;
     height: 128px;

@@ -43,7 +43,6 @@
     "eslint-plugin-vue": "^7.13.0",
     "filemanager-webpack-plugin": "^6.1.4",
     "image-webpack-loader": "^7.0.1",
-    "imagemin-gifsicle": "^2.0.0",
     "less": "^4.1.1",
     "less-loader": "^7.3.0",
     "prettier": "^2.3.2",
