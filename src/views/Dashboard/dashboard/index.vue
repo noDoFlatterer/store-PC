@@ -58,15 +58,7 @@
           {
             type: 'category',
             boundaryGap: false,
-            data: [
-              '2021-03-11',
-              '2021-03-12',
-              '2021-03-13',
-              '2021-03-14',
-              '2021-03-15',
-              '2021-03-16',
-              '2021-03-17',
-            ],
+            data: [],
           },
         ],
         yAxis: [
@@ -149,6 +141,7 @@
             option.series[2].data = response.data.login_user
             option.series[3].data = response.data.orders
             option.series[4].data = response.data.incomes
+            option.xAxis[0].data = response.data.date
           })
           .catch(function (error) {
             console.log(error)
