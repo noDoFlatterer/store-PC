@@ -81,11 +81,12 @@
         {
           title: '商品编号',
           dataIndex: 'goods_id',
+          width: 200,
           customCell: () => {
             return {
               style: {
-                'min-width': '150px',
-                'max-width': '200px',
+                'min-width': '3500px',
+                // 'max-width': '300px',
               },
             }
           },
@@ -94,79 +95,79 @@
         {
           title: '商品名',
           dataIndex: 'goods_name',
-          customCell: () => {
-            return {
-              style: {
-                'min-width': '150px',
-                'max-width': '200px',
-              },
-            }
-          },
+          // customCell: () => {
+          //   return {
+          //     style: {
+          //       'min-width': '150px',
+          //       'max-width': '200px',
+          //     },
+          //   }
+          // },
           ellipsis: true,
         },
         {
           title: '商品简介',
           dataIndex: 'introduce',
-          customCell: () => {
-            return {
-              style: {
-                'min-width': '150px',
-                'max-width': '200px',
-              },
-            }
-          },
+          // customCell: () => {
+          //   return {
+          //     style: {
+          //       'min-width': '150px',
+          //       'max-width': '200px',
+          //     },
+          //   }
+          // },
           ellipsis: true,
         },
         {
           title: '商品图片',
           dataIndex: 'image',
-          customCell: () => {
-            return {
-              style: {
-                'min-width': '150px',
-                'max-width': '200px',
-              },
-            }
-          },
+          // customCell: () => {
+          //   return {
+          //     style: {
+          //       'min-width': '150px',
+          //       'max-width': '200px',
+          //     },
+          //   }
+          // },
           ellipsis: true,
         },
         {
           title: '商品库存',
           dataIndex: 'count',
-          customCell: () => {
-            return {
-              style: {
-                'min-width': '150px',
-                'max-width': '200px',
-              },
-            }
-          },
+          // customCell: () => {
+          //   return {
+          //     style: {
+          //       'min-width': '150px',
+          //       'max-width': '200px',
+          //     },
+          //   }
+          // },
           ellipsis: true,
         },
         {
           title: '商品售价',
           dataIndex: 'price',
-          customCell: () => {
-            return {
-              style: {
-                'min-width': '150px',
-                'max-width': '200px',
-              },
-            }
-          },
+          // customCell: () => {
+          //   return {
+          //     style: {
+          //       'min-width': '150px',
+          //       'max-width': '200px',
+          //     },
+          //   }
+          // },
           ellipsis: true,
         },
         {
           title: '上架状态',
           dataIndex: 'status',
-          customCell: () => {
-            return {
-              style: {
-                'min-width': '150px',
-                'max-width': '200px',
-              },
-            }
-          },
+          // customCell: () => {
+          //   return {
+          //     style: {
+          //       'min-width': '150px',
+          //       'max-width': '200px',
+          //     },
+          //   }
+          // },
           ellipsis: true,
         },
         {
@@ -224,7 +225,7 @@
         router.push({
           name: 'add',
           query: {
-            state: 0,
+            state: 1,
           },
         })
       }
@@ -234,7 +235,7 @@
         router.push({
           name: 'add',
           query: {
-            state: 1,
+            state: 0,
           },
         })
       }

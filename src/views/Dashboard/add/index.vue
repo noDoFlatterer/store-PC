@@ -16,7 +16,7 @@
         v-model:value="formState.user.category"
         :options="options"
         expand-trigger="hover"
-        placeholder="Please select"
+        placeholder="请选择"
         change-on-select
         :open="open"
         @click="changeOpen"
@@ -128,6 +128,7 @@
   import { addGoods, uploadImg, getClassInfo, updateGoods } from '@/api/goods'
   import store from '@/store'
   import { useRoute } from 'vue-router'
+  import { useRouter } from 'vue-router'
 
   function getBase64(img, callback) {
     const reader = new FileReader()
@@ -153,9 +154,9 @@
         price: '', //售价
         count: '', // 库存
         tag: '', //标签
-        state: '', // 上架状态
+        state: 0, // 上架状态
         image: '', //主图
-        goods_id: '', //商品id
+        goods_id: 0, //商品id
       }
       const formState = reactive({
         user: {
@@ -167,9 +168,9 @@
           price: '', //售价
           count: '', // 库存
           tag: '', //标签
-          status: '', // 上架状态
+          status: 0, // 上架状态
           image: '', //主图
-          goods_id: '', //商品id
+          goods_id: 0, //商品id
         },
       })
 
@@ -288,26 +289,37 @@
         }
       }
 
+      var router = useRouter()
+
       const handleFinish = () => {
         if (Array.isArray(formState.user.category)) {
           const arr = formState.user.category
           formState.user.category = arr[arr.length - 1]
         }
+        // let temp = route.query.state
         if (route.query.state == 1) {
           console.log(formState.user)
-          addGoods(formState.user).then(() => {
-            // console.log(value, '提交成功')
-            message.info('添加成功')
-          })
-        } else {
-          console.log(formState.user)
+          console.log(route.query.state)
           updateGoods(formState.user).then(() => {
             // console.log(value, '修改成功')
             message.info('修改成功')
           })
+        } else {
+          console.log(formState.user)
+          console.log(route.query.state)
+          addGoods(formState.user).then(() => {
+            // console.log(value, '提交成功')
+            message.info('添加成功')
+          })
         }
         formState.user = user
         imageUrl.value = ''
+        router.push({
+          name: 'add',
+          query: {
+            state: 0,
+          },
+        })
       }
 
       const resetForm = () => {
@@ -363,6 +375,7 @@
         formData.append('f1', data.file)
         uploadImg(formData).then((res) => {
           formState.user.image = res.data
+          console.log(formState.user.image)
         })
       }
 
