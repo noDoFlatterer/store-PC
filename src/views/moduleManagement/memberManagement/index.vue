@@ -2,7 +2,7 @@
   import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
   import { reactive, ref } from 'vue'
   import { getUsers, updatestatus1, updatestatus0 } from '@/api/vip'
-  import { changeDate } from '@/utils/date.js'
+  // import { changeDate } from '@/utils/date.js'
   const columns = [
     {
       title: '昵称',
@@ -55,9 +55,9 @@
   function updatePage() {
     getUsers(page).then((res) => {
       pagination.total = Number(res.data.count)
-      res.data.users.map((item) => {
-        item.createdAt = changeDate(item.createdAt)
-      })
+      // res.data.users.map((item) => {
+      //   item.createdAt = changeDate(item.createdAt)
+      // })
       vip_data.value = res.data.users
     })
   }
